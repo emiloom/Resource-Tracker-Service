@@ -1,3 +1,39 @@
+TeamProject/HELP.md
+TeamProject/target/
+!TeamProject/.mvn/wrapper/maven-wrapper.jar
+!TeamProject/src/main/**/target/
+!TeamProject/src/test/**/target/
+
+### STS ###
+TeamProject/.apt_generated
+TeamProject/.classpath
+TeamProject/.factorypath
+TeamProject/.project
+TeamProject/.settings
+TeamProject/.springBeans
+TeamProject/.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+TeamProject/nbproject/private/
+TeamProject/nbbuild/
+TeamProject/dist/
+TeamProject/nbdist/
+TeamProject/.nb-gradle/
+TeamProject/build/
+!TeamProject/src/main/**/build/
+!TeamProject/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+.DS_Store
+
 # Compiled class file
 *.class
 
@@ -22,6 +58,3 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
-
-.vscode
-.idea
