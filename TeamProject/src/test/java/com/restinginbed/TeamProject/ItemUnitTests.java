@@ -20,16 +20,15 @@ public class ItemUnitTests {
     String name = "Banana";
     String description = "Banana Description";
     int count = 1;
-    String organization = "Banana Organization";
+    int organizationId = 1;
 
-
-    Item itemTest = new Item(id, name, description, count, organization);
+    Item itemTest = new Item(id, name, description, count, organizationId);
 
     assertEquals(itemTest.getId(), id);
     assertEquals(itemTest.getName(), name);
     assertEquals(itemTest.getDescription(), description);
     assertEquals(itemTest.getCount(), count);
-    assertEquals(itemTest.getOrganization(), organization);
+    assertEquals(itemTest.getOrganizationId(), organizationId);
 
   }
 
@@ -37,9 +36,9 @@ public class ItemUnitTests {
   public void addCountTest() {
     int id = 0;
     String name = "Banana";
-    String organization = "Banana Organization";
+    int organizationId = 1;
 
-    Item itemTest = new Item(id, name, organization);
+    Item itemTest = new Item(id, name, organizationId);
 
     assertEquals(itemTest.getCount(), 0);
 
@@ -53,9 +52,9 @@ public class ItemUnitTests {
   public void removeCountTest() {
     int id = 0;
     String name = "Banana";
-    String organization = "Banana Organization";
+    int organizationId = 1;
 
-    Item itemTest = new Item(id, name, organization);
+    Item itemTest = new Item(id, name, organizationId);
 
     assertEquals(itemTest.getCount(), 0);
 

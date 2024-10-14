@@ -50,8 +50,9 @@ public class Organization implements Serializable{
    *
    * @param item the Item to be added
    */
-  public void addItem(Item item) {
+  public boolean addItem(Item item) {
       items.add(item);
+      return true;
       // log success + transaction?
   }
 
@@ -60,8 +61,9 @@ public class Organization implements Serializable{
    *
    * @param item the Item to be deleted
    */
-  public void deleteItem(Item item) {
+  public boolean deleteItem(Item item) {
       items.remove(item);
+      return true;
   }
 
   /**
