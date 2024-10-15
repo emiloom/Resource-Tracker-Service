@@ -18,11 +18,11 @@ public class Item implements Serializable {
    * @param name          the name of the item
    * @param organization  the organization this item is located in
    */
-  public Item(int id, String name, String organization) {
+  public Item(int id, String name, int organization) {
     this.id = id;
     this.count = 0;
     this.description = "";
-    this.organization = organization;
+    this.organizationId = organization;
   }
 
   /**
@@ -34,11 +34,11 @@ public class Item implements Serializable {
    * @param count         the count of the item
    * @param organization  the organization this item is located in
    */
-  public Item(int id, String name, int count, String organization) {
+  public Item(int id, String name, int count, int organization) {
     this.id = id;
     this.count = count;
     this.description = "";
-    this.organization = organization;
+    this.organizationId = organization;
   }
 
   /**
@@ -48,14 +48,14 @@ public class Item implements Serializable {
    * @param name          the name of the item
    * @param description   the description of the item
    * @param count         the count of the item
-   * @param organization  the organization this item is located in
+   * @param organizationId  the organization this item is located in
    */
-  public Item(int id, String name, String description, int count, String organization) {
+  public Item(int id, String name, String description, int count, int organizationId) {
     this.id = id;
     this.name = name;
     this.description = description;
     this.count = count;
-    this.organization = organization;
+    this.organizationId = organizationId;
   }
 
   public int getId() { return id; }
@@ -70,8 +70,8 @@ public class Item implements Serializable {
   public int getCount() { return count; }
   public void setCount(int count) { this.count = count; }
 
-  public String getOrganization() { return organization; }
-  public void setOrganization(String organization) { this.organization = organization; }
+  public int getOrganizationId() { return organizationId; }
+  public void setOrganizationId(int organization) { this.organizationId = organization; }
 
   /**
    * Adds num to count of items.
@@ -107,6 +107,6 @@ public class Item implements Serializable {
   private String name;
   private String description;
   private int count;
-  private String organization;
+  private int organizationId;   //organization identified by its unique id rather than its name
 
 }
