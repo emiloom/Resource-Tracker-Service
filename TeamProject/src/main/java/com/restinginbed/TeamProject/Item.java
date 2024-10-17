@@ -3,12 +3,36 @@ package com.restinginbed.TeamProject;
 import java.io.Serial;
 import java.io.Serializable;
 
+import jakarta.persistence.*;
+
 /**
  * Represents an item that is stored in an organization.
  * This class stores information about the item including its id, name, count
  * and which organization location it is stored in.
  */
+@Entity
+@Table(name = "items")
 public class Item implements Serializable {
+
+  @Serial
+  private static final long serialVersionUID = 234567L;
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private int id;
+
+  @Column(name = "name", nullable = false)
+  private String name;
+
+  @Column(name = "description", nullable = false)
+  private String description;
+
+  @Column(name = "count")
+  private int count;
+
+  @Column(name = "organizationId", nullable = false)
+  private int organizationId;   //organization identified by its unique id rather than its name
+
 
   /**
    * Constructs a new Item object with the given parameters.
@@ -98,15 +122,5 @@ public class Item implements Serializable {
     }
     return false;
   }
-
-
-
-  @Serial
-  private static final long serialVersionUID = 234567L;
-  private int id;
-  private String name;
-  private String description;
-  private int count;
-  private int organizationId;   //organization identified by its unique id rather than its name
 
 }
