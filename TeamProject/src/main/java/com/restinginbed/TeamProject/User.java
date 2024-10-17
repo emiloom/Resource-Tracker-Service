@@ -3,10 +3,27 @@ package com.restinginbed.TeamProject;
 import java.io.Serial;
 import java.io.Serializable;
 
+import jakarta.persistence.*;
+
 /**
  * Represents a User that is browsing the website
  */
+@Entity
+@Table(name = "users")
 public class User implements Serializable {
+
+  @Serial
+  private static final long serialVersionUID = 123456L;
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private int id;
+
+  @Column(name = "longitude")
+  private double longitude;
+
+  @Column(name = "latitude")
+  private double latitude;
 
   /**
    * Constructs a User using the parameters
@@ -41,12 +58,4 @@ public class User implements Serializable {
 
   public double getLatitude() { return latitude; }
   public void setLatitude(double latitude) { this.latitude = latitude; }
-
-
-
-  @Serial
-  private static final long serialVersionUID = 123456L;
-  private int id;
-  private double longitude;
-  private double latitude;
 }
