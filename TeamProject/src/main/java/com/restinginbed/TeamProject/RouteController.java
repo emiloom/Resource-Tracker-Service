@@ -78,6 +78,9 @@ public class RouteController {
 
   /**
    * Create a new organization in the database.
+   *
+   * @param organization the organization to create
+   * @return ResponseEntity containing the created organization and HTTP status
    */
   @PostMapping(value = "/createOrganization", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> createOrganization(@RequestBody Organization organization) {
@@ -85,7 +88,8 @@ public class RouteController {
       Organization savedOrganization = organizationRepository.save(organization);
       return new ResponseEntity<>(savedOrganization, HttpStatus.CREATED);
     } catch (Exception e) {
-      return handleException(e);
+      // Handle the exception appropriately
+      return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -136,7 +140,7 @@ public class RouteController {
    *         an HTTP 200 response or, an appropriate message indicating the proper response.
    */
   @GetMapping(value = "/retrieveOrganization", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<?> retrieveOrganization(@RequestParam(value = "organizationID") Long organizationID) {
+  public ResponseEntity<?> retrieveOrganization(@RequestParam(value = "organizationID") Integer organizationID) {
     try {
       Optional<Organization> organization = organizationRepository.findById(organizationID);
       return organization.map(value -> new ResponseEntity<Object>(value, HttpStatus.OK))
@@ -234,7 +238,7 @@ public class RouteController {
    * @return A {@code ResponseEntity} object containing the updated Organization or an error message.
    */
   @PatchMapping(value = "/updateOrganization/{organizationID}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<?> updateOrganization(@PathVariable Long organizationID, @RequestBody Organization organization) {
+  public ResponseEntity<?> updateOrganization(@PathVariable Integer organizationID, @RequestBody Organization organization) {
     try {
       if (!organizationRepository.existsById(organizationID)) {
         return new ResponseEntity<>("Organization not found", HttpStatus.NOT_FOUND);
@@ -253,7 +257,7 @@ public class RouteController {
    * @return A {@code ResponseEntity} indicating the result of the deletion.
    */
   @DeleteMapping(value = "/deleteOrganization/{organizationID}")
-  public ResponseEntity<?> deleteOrganization(@PathVariable Long organizationID) {
+  public ResponseEntity<?> deleteOrganization(@PathVariable Integer organizationID) {
     try {
       if (!organizationRepository.existsById(organizationID)) {
         return new ResponseEntity<>("Organization not found", HttpStatus.NOT_FOUND);
@@ -285,19 +289,19 @@ public class RouteController {
     }
   }
 
-  @GetMapping(value = "/organizations/{organizationID}/items", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<?> getItemsByOrganization(@PathVariable Long organizationID) {
-    try {
-      Optional<Organization> organization = organizationRepository.findById(organizationID);
-      if (organization.isPresent()) {
-        return new ResponseEntity<>(organization.get().getItems(), HttpStatus.OK);
-      } else {
-        return new ResponseEntity<>("Organization not found", HttpStatus.NOT_FOUND);
-      }
-    } catch (Exception e) {
-      return handleException(e);
-    }
-  }
+//  @GetMapping(value = "/organizations/{organizationID}/items", produces = MediaType.APPLICATION_JSON_VALUE)
+//  public ResponseEntity<?> getItemsByOrganization(@PathVariable Long organizationID) {
+//    try {
+//      Optional<Organization> organization = organizationRepository.findById(organizationID);
+//      if (organization.isPresent()) {
+//        return new ResponseEntity<>(organization.get().getItems(), HttpStatus.OK);
+//      } else {
+//        return new ResponseEntity<>("Organization not found", HttpStatus.NOT_FOUND);
+//      }
+//    } catch (Exception e) {
+//      return handleException(e);
+//    }
+//  }
 
   // @GetMapping(value = "/searchItems", produces = MediaType.APPLICATION_JSON_VALUE)
   // public ResponseEntity<?> searchItems(@RequestParam String name) {
