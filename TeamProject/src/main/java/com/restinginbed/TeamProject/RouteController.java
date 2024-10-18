@@ -176,10 +176,10 @@ public class RouteController {
   @DeleteMapping(value = "/deleteUser/{userID}")
   public ResponseEntity<?> deleteUser(@PathVariable Long userID) {
     try {
-      if (!userRepository.existsById(userID)) {
+      if (!userRepository.existsById(userID.intValue())) {
         return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
       }
-      userRepository.deleteById(userID);
+      userRepository.deleteById(userID.intValue());
       return new ResponseEntity<>("User deleted successfully", HttpStatus.OK);
     } catch (Exception e) {
       return handleException(e);
