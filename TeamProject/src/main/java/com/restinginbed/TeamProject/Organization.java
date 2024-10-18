@@ -3,6 +3,13 @@ package com.restinginbed.TeamProject;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
 import java.util.ArrayList;
 
 /**
@@ -10,6 +17,7 @@ import java.util.ArrayList;
  * an entity that is providing a resource for people. They will own a list of resources (items) that they 
  * have to track the availability of.
  */
+@Entity
 public class Organization implements Serializable{ 
 
   /**
@@ -166,11 +174,20 @@ public class Organization implements Serializable{
   
   @Serial
   private static final long serialVersionUID = 234567L;
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private final int id;
+
+  @Column(name="Name", nullable=false)
   private String name;
+
+  @Column(name="Items", nullable=false)
   private String description;
   private double longitude;
   private double latitude;
+
+  @Column(name="Items", nullable=false)
   private List<Item> items = new ArrayList<>();
 
 }
