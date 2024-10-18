@@ -1,6 +1,5 @@
 package com.restinginbed.TeamProject;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
 import com.restinginbed.TeamProject.jpa_repositories.ItemRepository;
 import com.restinginbed.TeamProject.jpa_repositories.OrganizationRepository;
-import com.restinginbed.TeamProject.jpa_repositories.UserRepository;
+import com.restinginbed.TeamProject.jpa_repositories.ClientRepository;
 
 @RestController
 public class RouteController {
@@ -32,7 +31,7 @@ public class RouteController {
   private OrganizationRepository organizationRepository;
 
   @Autowired
-  private UserRepository userRepository;
+  private ClientRepository clientRepository;
 
   @Autowired
   private ItemRepository itemRepository;
@@ -54,10 +53,10 @@ public class RouteController {
    * Create a new user in the database.
    */
   @PostMapping(value = "/createUser", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<?> createUser(@RequestBody User user) {
+  public ResponseEntity<?> createUser(@RequestBody Client client) {
     try {
-      User savedUser = userRepository.save(user);
-      return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
+      Client savedClient = clientRepository.save(client);
+      return new ResponseEntity<>(savedClient, HttpStatus.CREATED);
     } catch (Exception e) {
       return handleException(e);
     }
@@ -93,6 +92,25 @@ public class RouteController {
     }
   }
 
+//  /**
+//   * Create a new organization in the database using raw SQL.
+//   *
+//   * @param organization the organization to create
+//   * @return ResponseEntity containing HTTP status
+//   */
+//  @PostMapping(value = "/createOrganizationNative", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+//  public ResponseEntity<?> createOrganizationNative(@RequestBody Organization organization) {
+//    try {
+//      // Call the native query method to insert with the given ID
+//      organizationRepository.insertOrganization(organization.getId(), organization.getName(), organization.getLocation());
+//      return new ResponseEntity<>(HttpStatus.CREATED);
+//    } catch (Exception e) {
+//      // Log the error and return an error response
+//      e.printStackTrace();
+//      return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+//    }
+//  }
+
   /**
    * Returns the details of the specified user.
    *
@@ -104,8 +122,8 @@ public class RouteController {
   @GetMapping(value = "/retrieveUser", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> retrieveUser(@RequestParam(value = "userID") Integer userID) {
     try {
-      Optional<User> user = userRepository.findById(userID); // Use userID directly
-      return user.map(value -> new ResponseEntity<Object>(value, HttpStatus.OK))
+      Optional<Client> client = clientRepository.findById(userID); // Use userID directly
+      return client.map(value -> new ResponseEntity<Object>(value, HttpStatus.OK))
         .orElse(new ResponseEntity<Object>("User not found", HttpStatus.NOT_FOUND));
     } catch (Exception e) {
       return handleException(e);
@@ -153,19 +171,26 @@ public class RouteController {
   /**
    * Updates an existing user in the database.
    *
-   * @param userID A {@code Long} representing the user ID.
-   * @param user A {@code User} object containing updated user details.
+   * @param client_id A {@code Long} representing the user ID.
+   * @param client A {@code User} object containing updated user details.
    * @return A {@code ResponseEntity} object containing the updated User or an error message.
    */
-  @PatchMapping(value = "/updateUser/{userID}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<?> updateUser(@PathVariable Long userID, @RequestBody User user) {
+  @PatchMapping(value = "/updateUser/{client_id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> updateUser(@PathVariable Long client_id, @RequestBody Client client) {
     try {
-      if (!userRepository.existsById(userID.intValue())) {
+      if (!clientRepository.existsById(client_id.intValue())) {
         return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
       }
-      user.setId(userID.intValue());
-      User updatedUser = userRepository.save(user);
-      return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+
+      Client existingClient = clientRepository.findById(client_id.intValue())
+              .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+      existingClient.setName(client.getName());
+      existingClient.setLocation(client.getLocation());
+
+      Client updatedClient = clientRepository.save(existingClient);
+
+      return new ResponseEntity<>(updatedClient, HttpStatus.OK);
     } catch (Exception e) {
       return handleException(e);
     }
@@ -174,16 +199,16 @@ public class RouteController {
   /**
    * Deletes a user from the database.
    *
-   * @param userID A {@code Long} representing the user ID.
+   * @param client_id A {@code Long} representing the user ID.
    * @return A {@code ResponseEntity} indicating the result of the deletion.
    */
-  @DeleteMapping(value = "/deleteUser/{userID}")
-  public ResponseEntity<?> deleteUser(@PathVariable Long userID) {
+  @DeleteMapping(value = "/deleteUser/{client_id}")
+  public ResponseEntity<?> deleteUser(@PathVariable Long client_id) {
     try {
-      if (!userRepository.existsById(userID.intValue())) {
+      if (!clientRepository.existsById(client_id.intValue())) {
         return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
       }
-      userRepository.deleteById(userID.intValue());
+      clientRepository.deleteById(client_id.intValue());
       return new ResponseEntity<>("User deleted successfully", HttpStatus.OK);
     } catch (Exception e) {
       return handleException(e);
@@ -272,7 +297,7 @@ public class RouteController {
   @GetMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> getAllUsers() {
     try {
-      List<User> users = userRepository.findAll();
+      List<Client> users = clientRepository.findAll();
       return new ResponseEntity<>(users, HttpStatus.OK);
     } catch (Exception e) {
       return handleException(e);

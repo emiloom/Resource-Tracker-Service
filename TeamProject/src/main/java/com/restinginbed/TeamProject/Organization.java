@@ -33,7 +33,6 @@ public class Organization implements Serializable {
    * Default constructor required by JPA.
    */
   public Organization() {
-    // Default constructor
   }
 
   /**
