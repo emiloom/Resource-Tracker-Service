@@ -50,6 +50,12 @@ public class User implements Serializable {
     this.latitude = latitude;
   }
 
+  // no-argument constructor for JPA
+  public User() {
+    this.longitude = 0;
+    this.latitude = 0;
+  }
+
   public int getId() { return id; }
   public void setId(int id) { this.id = id; }
 

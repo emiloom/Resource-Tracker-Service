@@ -92,15 +92,15 @@ public class RouteController {
   /**
    * Returns the details of the specified user.
    *
-   * @param userID A {@code Long} representing the user.
+   * @param userID A {@code Integer} representing the user.
    *
    * @return A {@code ResponseEntity} object containing either the details of the User and
    *         an HTTP 200 response or, an appropriate message indicating the proper response.
    */
   @GetMapping(value = "/retrieveUser", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<?> retrieveUser(@RequestParam(value = "userID") Long userID) {
+  public ResponseEntity<?> retrieveUser(@RequestParam(value = "userID") Integer userID) {
     try {
-      Optional<User> user = userRepository.findById(userID);
+      Optional<User> user = userRepository.findById(userID); // Use userID directly
       return user.map(value -> new ResponseEntity<Object>(value, HttpStatus.OK))
         .orElse(new ResponseEntity<Object>("User not found", HttpStatus.NOT_FOUND));
     } catch (Exception e) {
@@ -111,13 +111,13 @@ public class RouteController {
   /**
    * Returns the details of the specified item.
    *
-   * @param itemID A {@code Long} representing the item.
+   * @param itemID A {@code Integer} representing the item.
    *
    * @return A {@code ResponseEntity} object containing either the details of the Item and
    *         an HTTP 200 response or, an appropriate message indicating the proper response.
    */
   @GetMapping(value = "/retrieveItem", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<?> retrieveItem(@RequestParam(value = "itemID") Long itemID) {
+  public ResponseEntity<?> retrieveItem(@RequestParam(value = "itemID") Integer itemID) {
     try {
       Optional<Item> item = itemRepository.findById(itemID);
       return item.map(value -> new ResponseEntity<Object>(value, HttpStatus.OK))
@@ -156,7 +156,7 @@ public class RouteController {
   @PatchMapping(value = "/updateUser/{userID}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> updateUser(@PathVariable Long userID, @RequestBody User user) {
     try {
-      if (!userRepository.existsById(userID)) {
+      if (!userRepository.existsById(userID.intValue())) {
         return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
       }
       user.setId(userID.intValue());
@@ -189,17 +189,17 @@ public class RouteController {
   /**
    * Updates an existing item in the database.
    *
-   * @param itemID A {@code Long} representing the item ID.
+   * @param itemID A {@code Integer} representing the item ID.
    * @param item A {@code Item} object containing updated item details.
    * @return A {@code ResponseEntity} object containing the updated Item or an error message.
    */
   @PatchMapping(value = "/updateItem/{itemID}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<?> updateItem(@PathVariable Long itemID, @RequestBody Item item) {
+  public ResponseEntity<?> updateItem(@PathVariable Integer itemID, @RequestBody Item item) {
     try {
       if (!itemRepository.existsById(itemID)) {
         return new ResponseEntity<>("Item not found", HttpStatus.NOT_FOUND);
       }
-      item.setId(itemID.intValue());
+      item.setId(itemID);
       Item updatedItem = itemRepository.save(item);
       return new ResponseEntity<>(updatedItem, HttpStatus.OK);
     } catch (Exception e) {
@@ -210,11 +210,11 @@ public class RouteController {
   /**
    * Deletes an item from the database.
    *
-   * @param itemID A {@code Long} representing the item ID.
+   * @param itemID A {@code Integer} representing the item ID.
    * @return A {@code ResponseEntity} indicating the result of the deletion.
    */
   @DeleteMapping(value = "/deleteItem/{itemID}")
-  public ResponseEntity<?> deleteItem(@PathVariable Long itemID) {
+  public ResponseEntity<?> deleteItem(@PathVariable Integer itemID) {
     try {
       if (!itemRepository.existsById(itemID)) {
         return new ResponseEntity<>("Item not found", HttpStatus.NOT_FOUND);
