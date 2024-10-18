@@ -239,7 +239,6 @@ public class RouteController {
       if (!organizationRepository.existsById(organizationID)) {
         return new ResponseEntity<>("Organization not found", HttpStatus.NOT_FOUND);
       }
-      organization.setId(organizationID.intValue());
       Organization updatedOrganization = organizationRepository.save(organization);
       return new ResponseEntity<>(updatedOrganization, HttpStatus.OK);
     } catch (Exception e) {
@@ -300,15 +299,15 @@ public class RouteController {
     }
   }
 
-  @GetMapping(value = "/searchItems", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<?> searchItems(@RequestParam String name) {
-    try {
-      List<Item> items = itemRepository.findByNameContaining(name);
-      return new ResponseEntity<>(items, HttpStatus.OK);
-    } catch (Exception e) {
-      return handleException(e);
-    }
-  }
+  // @GetMapping(value = "/searchItems", produces = MediaType.APPLICATION_JSON_VALUE)
+  // public ResponseEntity<?> searchItems(@RequestParam String name) {
+  //   try {
+  //     List<Item> items = itemRepository.findByNameContaining(name);
+  //     return new ResponseEntity<>(items, HttpStatus.OK);
+  //   } catch (Exception e) {
+  //     return handleException(e);
+  //   }
+  // }
 
   private ResponseEntity<?> handleException(Exception e) {
     System.out.println(e.toString());
