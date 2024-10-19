@@ -130,8 +130,6 @@ This section includes notes on tools and technologies used in building this proj
 * Checkstyle
   * We use Checkstyle for code reporting.
   * For running Checkstyle manually, you can use the "Checkstyle-IDEA" plugin for IntelliJ.
-* PMD
-  * We are using PMD to do static analysis of our Java code.
 * JaCoCo
   * We use JaCoCo for generating code coverage reports.
   * Originally we were planning on using Cobertura, however Cobertura does not support our version of Java.
