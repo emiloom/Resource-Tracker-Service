@@ -104,12 +104,19 @@ Any malformed request such that there is an error in your wording or such that t
 We used the tool "checkstyle" with the configuration file "google_checks.xml" to check the style of our code and generate style checking reports. Here is the report
 as of the day of 10/18/2024 (These can be found in the reports folder):
 
-![Screenshot of a checkstyle with no errors]()
+![Screenshot of a checkstyle with no errors](TeamProject/check-style-result.png)
 
 ## Branch Coverage Reporting
 We used JaCoCo to perform branch analysis in order to see the branch coverage of the relevant code within the code base. See below for screenshots demonstrating output.
 
-![Screenshot of a code coverage report from the plugin]()
+![Screenshot of a code coverage report from the plugin](TeamProject/jacoco-report-result.png)
+
+
+## Project Management
+We used Trello cards to do our project management
+![Screenshot of our Trello (1)](TeamProject/trello-screenshot.png)
+![Screenshot of our Trello (2)](TeamProject/trello-screenshot-2.png)
+![Screenshot of our Trello labels](TeamProject/trello-screenshot-labels.png)
 
 
 ## An Initial Note to Developers
