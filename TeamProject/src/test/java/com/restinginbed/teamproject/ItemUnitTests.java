@@ -1,8 +1,7 @@
-package com.restinginbed.TeamProject;
+package com.restinginbed.teamproject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
@@ -15,7 +14,7 @@ import org.springframework.test.context.ContextConfiguration;
 public class ItemUnitTests {
 
   @Test
-  public void ItemUnitTest() {
+  public void itemUnitTest() {
     int id = 1;
     String name = "Banana";
     String description = "Banana Description";
