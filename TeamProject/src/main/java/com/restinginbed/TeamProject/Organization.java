@@ -21,7 +21,7 @@ public class Organization implements Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "organization_id", nullable = false)
-  private int id;
+  private int organizationId;
 
   @Column(name = "organization_name", nullable = false)
   private String name;
@@ -61,8 +61,8 @@ public class Organization implements Serializable {
    *
    * @return the organization's ID
    */
-  public int getId() {
-    return id;
+  public int getOrganizationId() {
+    return organizationId;
   }
 
   /**
