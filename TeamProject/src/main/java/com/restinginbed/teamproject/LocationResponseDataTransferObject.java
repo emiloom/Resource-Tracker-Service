@@ -1,10 +1,10 @@
 package com.restinginbed.teamproject;
 
-public class LocationResponseDTO {
+public class LocationResponseDataTransferObject {
   private double latitude;
   private double longitude;
 
-  public LocationResponseDTO(double latitude, double longitude) {
+  public LocationResponseDataTransferObject(double latitude, double longitude) {
     this.latitude = latitude;
     this.longitude = longitude;
   }

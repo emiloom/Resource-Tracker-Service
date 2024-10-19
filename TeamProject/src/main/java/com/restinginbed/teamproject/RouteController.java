@@ -100,21 +100,21 @@ public class RouteController {
   /**
    * Resolves the latitude and longitude for a given location query.
    * 
-   * @param locationQueryDTO the request body containing the location query string.
+   * @param locationQueryDataTransferObject the request body containing the location query string.
    * @return a {@link ResponseEntity} with the resolved latitude and longitude in a 
-   *         {@link LocationResponseDTO}, or an error response if resolution fails.
+   *         {@link LocationResponseDataTransferObject}, or an error response if resolution fails.
    */
   @PostMapping(value = "/resolveLocation", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<?> resolveLocation(@RequestBody LocationQueryDTO locationQueryDTO){
+  public ResponseEntity<?> resolveLocation(@RequestBody LocationQueryDataTransferObject locationQueryDataTransferObject){
     try {
-      String placeDetails = googlePlacesService.getPlaceDetails(locationQueryDTO.getLocationQuery());
+      String placeDetails = googlePlacesService.getPlaceDetails(locationQueryDataTransferObject.getLocationQuery());
       
       ObjectMapper objectMapper = new ObjectMapper();
       JsonNode jsonNode = objectMapper.readTree(placeDetails);
       double longitude = jsonNode.path("geometry").path("location").path("lng").asDouble();
       double latitude = jsonNode.path("geometry").path("location").path("lat").asDouble();
 
-      LocationResponseDTO locationResponse = new LocationResponseDTO(latitude, longitude);
+      LocationResponseDataTransferObject locationResponse = new LocationResponseDataTransferObject(latitude, longitude);
       return new ResponseEntity<>(locationResponse, HttpStatus.OK);
     } catch (Exception e) {
       return handleException(e);

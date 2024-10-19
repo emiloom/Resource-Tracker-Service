@@ -1,12 +1,12 @@
 package com.restinginbed.teamproject;
 
-public class LocationQueryDTO {
+public class LocationQueryDataTransferObject {
   private int id;
   private String locationQuery;
 
-  public LocationQueryDTO() {}
+  public LocationQueryDataTransferObject() {}
 
-  public LocationQueryDTO(int id, String locationQuery) {
+  public LocationQueryDataTransferObject(int id, String locationQuery) {
     this.id = id;
     this.locationQuery = locationQuery;
    }
