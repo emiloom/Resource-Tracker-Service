@@ -17,6 +17,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import com.restinginbed.TeamProject.jpa_repositories.ItemRepository;
 import com.restinginbed.TeamProject.jpa_repositories.OrganizationRepository;
 import com.restinginbed.TeamProject.jpa_repositories.ClientRepository;
+import com.restinginbed.TeamProject.LocationQueryDTO;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 public class RouteController {
@@ -35,6 +38,9 @@ public class RouteController {
 
   @Autowired
   private ItemRepository itemRepository;
+
+  @Autowired
+  private GooglePlacesService googlePlacesService;
 
   /**
    * Redirects to the homepage.
@@ -89,6 +95,23 @@ public class RouteController {
     } catch (Exception e) {
       // Handle the exception appropriately
       return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @PostMapping(value = "/resolveLocation", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> resolveLocation(@RequestBody LocationQueryDTO locationQueryDTO){
+    try {
+      String placeDetails = googlePlacesService.getPlaceDetails(locationQueryDTO.getLocationQuery());
+      
+      ObjectMapper objectMapper = new ObjectMapper();
+      JsonNode jsonNode = objectMapper.readTree(placeDetails);
+      double longitude = jsonNode.path("geometry").path("location").path("lng").asDouble();
+      double latitude = jsonNode.path("geometry").path("location").path("lat").asDouble();
+
+      LocationResponseDTO locationResponse = new LocationResponseDTO(latitude, longitude);
+      return new ResponseEntity<>(locationResponse, HttpStatus.OK);
+    } catch (Exception e) {
+      return handleException(e);
     }
   }
 
