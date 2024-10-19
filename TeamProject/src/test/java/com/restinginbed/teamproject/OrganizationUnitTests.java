@@ -24,9 +24,8 @@ public class OrganizationUnitTests {
     testOrganization = new Organization("testOrganization");
   }
 
- @Test
- public void setName_success() {
-   assertEquals(testOrganization.setName("newName"), true);
- }
-
+  @Test
+  public void setName_success() {
+    assertEquals(testOrganization.setName("newName"), true);
+  }
 }
