@@ -1,4 +1,4 @@
-package com.restinginbed.TeamProject;
+package com.restinginbed.teamproject;
 
 import java.io.Serial;
 import java.io.Serializable;

@@ -1,4 +1,4 @@
-package com.restinginbed.TeamProject;
+package com.restinginbed.teamproject;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,10 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
-import com.restinginbed.TeamProject.jpa_repositories.ItemRepository;
-import com.restinginbed.TeamProject.jpa_repositories.OrganizationRepository;
-import com.restinginbed.TeamProject.jpa_repositories.ClientRepository;
-import com.restinginbed.TeamProject.LocationQueryDTO;
+import com.restinginbed.teamproject.jparepositories.ItemRepository;
+import com.restinginbed.teamproject.jparepositories.OrganizationRepository;
+import com.restinginbed.teamproject.jparepositories.ClientRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

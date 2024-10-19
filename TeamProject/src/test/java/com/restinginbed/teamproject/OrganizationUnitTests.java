@@ -1,4 +1,4 @@
-package com.restinginbed.TeamProject;
+package com.restinginbed.teamproject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

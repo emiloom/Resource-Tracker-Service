@@ -1,4 +1,4 @@
-package com.restinginbed.TeamProject;
+package com.restinginbed.teamproject;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;

@@ -1,8 +1,8 @@
-package com.restinginbed.TeamProject;
+package com.restinginbed.teamproject;
 
-import com.restinginbed.TeamProject.jpa_repositories.ClientRepository;
-import com.restinginbed.TeamProject.jpa_repositories.ItemRepository;
-import com.restinginbed.TeamProject.jpa_repositories.OrganizationRepository;
+import com.restinginbed.teamproject.jparepositories.ClientRepository;
+import com.restinginbed.teamproject.jparepositories.ItemRepository;
+import com.restinginbed.teamproject.jparepositories.OrganizationRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

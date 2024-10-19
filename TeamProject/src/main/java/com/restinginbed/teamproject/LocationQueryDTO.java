@@ -1,4 +1,4 @@
-package com.restinginbed.TeamProject;
+package com.restinginbed.teamproject;
 
 public class LocationQueryDTO {
   private int id;

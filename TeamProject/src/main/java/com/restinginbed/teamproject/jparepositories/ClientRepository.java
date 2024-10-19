@@ -1,7 +1,7 @@
-package com.restinginbed.TeamProject.jpa_repositories;
+package com.restinginbed.teamproject.jparepositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import com.restinginbed.TeamProject.Client;
+import com.restinginbed.teamproject.Client;
 
 public interface ClientRepository extends JpaRepository<Client, Integer> {
 }
