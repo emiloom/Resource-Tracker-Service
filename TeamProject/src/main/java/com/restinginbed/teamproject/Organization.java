@@ -1,13 +1,12 @@
-package com.restinginbed.TeamProject;
-
-import java.io.Serial;
-import java.io.Serializable;
+package com.restinginbed.teamproject;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.io.Serial;
+import java.io.Serializable;
 
 /**
  * Represents an organization entity with an ID, name, and location.
