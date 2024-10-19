@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface ItemRepository extends JpaRepository<Item, Integer> {
 	List<Item> findByNameContaining(String name);
+  List<Item> findByOrganizationId(Integer organizationId);
 }
