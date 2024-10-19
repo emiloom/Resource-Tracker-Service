@@ -1,10 +1,14 @@
-package com.restinginbed.TeamProject;
+package com.restinginbed.teamproject;
 
-public class LocationResponseDTO {
+/**
+ * A Data Transfer Object (DTO) representing a response that includes
+ * latitude and longitude coordinates.
+ */
+public class LocationResponseDataTransferObject {
   private double latitude;
   private double longitude;
 
-  public LocationResponseDTO(double latitude, double longitude) {
+  public LocationResponseDataTransferObject(double latitude, double longitude) {
     this.latitude = latitude;
     this.longitude = longitude;
   }
