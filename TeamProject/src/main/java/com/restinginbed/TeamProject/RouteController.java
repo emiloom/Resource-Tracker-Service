@@ -56,10 +56,10 @@ public class RouteController {
 
     
   /**
-   * Create a new user in the database.
+   * Create a new client in the database.
    */
-  @PostMapping(value = "/createUser", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<?> createUser(@RequestBody Client client) {
+  @PostMapping(value = "/createClient", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> createClient(@RequestBody Client client) {
     try {
       Client savedClient = clientRepository.save(client);
       return new ResponseEntity<>(savedClient, HttpStatus.CREATED);
@@ -98,6 +98,13 @@ public class RouteController {
     }
   }
 
+  /**
+   * Resolves the latitude and longitude for a given location query.
+   * 
+   * @param locationQueryDTO the request body containing the location query string.
+   * @return a {@link ResponseEntity} with the resolved latitude and longitude in a 
+   *         {@link LocationResponseDTO}, or an error response if resolution fails.
+   */
   @PostMapping(value = "/resolveLocation", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> resolveLocation(@RequestBody LocationQueryDTO locationQueryDTO){
     try {
@@ -135,19 +142,19 @@ public class RouteController {
 //  }
 
   /**
-   * Returns the details of the specified user.
+   * Returns the details of the specified client.
    *
-   * @param userID A {@code Integer} representing the user.
+   * @param clientID A {@code Integer} representing the client.
    *
-   * @return A {@code ResponseEntity} object containing either the details of the User and
+   * @return A {@code ResponseEntity} object containing either the details of the Client and
    *         an HTTP 200 response or, an appropriate message indicating the proper response.
    */
-  @GetMapping(value = "/retrieveUser", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<?> retrieveUser(@RequestParam(value = "userID") Integer userID) {
+  @GetMapping(value = "/retrieveClient", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> retrieveClient(@RequestParam(value = "clientID") Integer clientID) {
     try {
-      Optional<Client> client = clientRepository.findById(userID); // Use userID directly
+      Optional<Client> client = clientRepository.findById(clientID); // Use clientID directly
       return client.map(value -> new ResponseEntity<Object>(value, HttpStatus.OK))
-        .orElse(new ResponseEntity<Object>("User not found", HttpStatus.NOT_FOUND));
+        .orElse(new ResponseEntity<Object>("Client not found", HttpStatus.NOT_FOUND));
     } catch (Exception e) {
       return handleException(e);
     }
@@ -192,21 +199,21 @@ public class RouteController {
   }
 
   /**
-   * Updates an existing user in the database.
+   * Updates an existing client in the database.
    *
-   * @param client_id A {@code Long} representing the user ID.
-   * @param client A {@code User} object containing updated user details.
-   * @return A {@code ResponseEntity} object containing the updated User or an error message.
+   * @param client_id A {@code Long} representing the client ID.
+   * @param client A {@code Client} object containing updated client details.
+   * @return A {@code ResponseEntity} object containing the updated Client or an error message.
    */
-  @PatchMapping(value = "/updateUser/{client_id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<?> updateUser(@PathVariable Long client_id, @RequestBody Client client) {
+  @PatchMapping(value = "/updateClient/{client_id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> updateClient(@PathVariable Integer client_id, @RequestBody Client client) {
     try {
-      if (!clientRepository.existsById(client_id.intValue())) {
-        return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+      if (!clientRepository.existsById(client_id)) {
+        return new ResponseEntity<>("Client not found", HttpStatus.NOT_FOUND);
       }
 
-      Client existingClient = clientRepository.findById(client_id.intValue())
-              .orElseThrow(() -> new IllegalArgumentException("User not found"));
+      Client existingClient = clientRepository.findById(client_id)
+              .orElseThrow(() -> new IllegalArgumentException("Client not found"));
 
       existingClient.setName(client.getName());
       existingClient.setLocation(client.getLocation());
@@ -220,19 +227,19 @@ public class RouteController {
   }
 
   /**
-   * Deletes a user from the database.
+   * Deletes a client from the database.
    *
-   * @param client_id A {@code Long} representing the user ID.
+   * @param client_id A {@code Long} representing the client ID.
    * @return A {@code ResponseEntity} indicating the result of the deletion.
    */
-  @DeleteMapping(value = "/deleteUser/{client_id}")
-  public ResponseEntity<?> deleteUser(@PathVariable Long client_id) {
+  @DeleteMapping(value = "/deleteClient/{client_id}")
+  public ResponseEntity<?> deleteClient(@PathVariable Long client_id) {
     try {
       if (!clientRepository.existsById(client_id.intValue())) {
-        return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>("Client not found", HttpStatus.NOT_FOUND);
       }
       clientRepository.deleteById(client_id.intValue());
-      return new ResponseEntity<>("User deleted successfully", HttpStatus.OK);
+      return new ResponseEntity<>("Client deleted successfully", HttpStatus.OK);
     } catch (Exception e) {
       return handleException(e);
     }
@@ -317,24 +324,36 @@ public class RouteController {
     }
   }
 
-  @GetMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<?> getAllUsers() {
-    try {
-      List<Client> users = clientRepository.findAll();
-      return new ResponseEntity<>(users, HttpStatus.OK);
-    } catch (Exception e) {
-      return handleException(e);
-    }
+  /**
+   * Retrieves all clients from the database.
+   *
+   * @return A {@link ResponseEntity} containing a list of clients and HTTP status 200 (OK),
+   *         or an error message if an exception occurs.
+   */
+  @GetMapping(value = "/clients", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> getAllClients() {
+      try {
+          List<Client> clients = clientRepository.findAll();
+          return new ResponseEntity<>(clients, HttpStatus.OK);
+      } catch (Exception e) {
+          return handleException(e);
+      }
   }
 
+  /**
+   * Retrieves all organizations from the database.
+   *
+   * @return A {@link ResponseEntity} containing a list of organizations and HTTP status 200 (OK),
+   *         or an error message if an exception occurs.
+   */
   @GetMapping(value = "/organizations", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> getAllOrganizations() {
-    try {
-      List<Organization> organizations = organizationRepository.findAll();
-      return new ResponseEntity<>(organizations, HttpStatus.OK);
-    } catch (Exception e) {
-      return handleException(e);
-    }
+      try {
+          List<Organization> organizations = organizationRepository.findAll();
+          return new ResponseEntity<>(organizations, HttpStatus.OK);
+      } catch (Exception e) {
+          return handleException(e);
+      }
   }
 
   /**
@@ -344,24 +363,10 @@ public class RouteController {
    * @param organizationID
    * @return ResponseEntity with the List of items found
    */
- @GetMapping(value = "/organizations/{organizationID}/items", produces = MediaType.APPLICATION_JSON_VALUE)
- public ResponseEntity<?> getOrganizationItems(@PathVariable Integer organizationID) {
-   try {
-     Optional<List<Item>> items = Optional.of(itemRepository.findByOrganizationId(organizationID));
-     if (items.isPresent()) {
-       return new ResponseEntity<>(items.get(), HttpStatus.OK);
-     } else {
-       return new ResponseEntity<>("No items found", HttpStatus.NOT_FOUND);
-     }
-   } catch (Exception e) {
-     return handleException(e);
-   }
- }
-
-  @GetMapping(value = "/searchItems", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<?> searchItems(@RequestParam String name) {
+  @GetMapping(value = "/organizations/{organizationID}/items", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> getOrganizationItems(@PathVariable Integer organizationID) {
     try {
-      Optional<List<Item>> items = Optional.of(itemRepository.findByNameContaining(name));
+      Optional<List<Item>> items = Optional.of(itemRepository.findByOrganizationId(organizationID));
       if (items.isPresent()) {
         return new ResponseEntity<>(items.get(), HttpStatus.OK);
       } else {
@@ -372,9 +377,37 @@ public class RouteController {
     }
   }
 
-  private ResponseEntity<?> handleException(Exception e) {
-    System.out.println(e.toString());
-    return new ResponseEntity<>("An error has occurred", HttpStatus.INTERNAL_SERVER_ERROR);
+  /**
+   * Searches for items containing the specified search term.
+   *
+   * @param searchTerm A {@code String} representing the term to search for in item names.
+   * @return A {@link ResponseEntity} containing a list of matching items if found, or an error message if not found.
+   */
+  @GetMapping(value = "/searchItems", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> searchItems(@RequestParam String searchTerm) {
+      try {
+          Optional<List<Item>> items = Optional.of(itemRepository.findByNameContaining(searchTerm));
+
+          if (items.isPresent() && !items.get().isEmpty()) {
+              return new ResponseEntity<>(items.get(), HttpStatus.OK);
+          } else {
+              return new ResponseEntity<>("No items found", HttpStatus.NOT_FOUND);
+          }
+      } catch (Exception e) {
+          return handleException(e);
+      }
   }
+
+  /**
+   * Handles exceptions that occur during API calls.
+   *
+   * @param e The {@link Exception} that was thrown.
+   * @return A {@link ResponseEntity} indicating an internal server error has occurred.
+   */
+  private ResponseEntity<?> handleException(Exception e) {
+      System.out.println(e.toString());
+      return new ResponseEntity<>("An error has occurred", HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+
   
 }

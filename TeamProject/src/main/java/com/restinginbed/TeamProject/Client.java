@@ -55,6 +55,10 @@ public class Client implements Serializable {
     return this.client_name;
   }
 
+  public Integer getId() {
+    return this.client_id;
+  }
+
   public void setName(String name) {
     this.client_name = name;
   }
