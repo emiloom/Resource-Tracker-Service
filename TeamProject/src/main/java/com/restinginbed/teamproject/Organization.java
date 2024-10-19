@@ -78,8 +78,9 @@ public class Organization implements Serializable {
    *
    * @param name the new name of the organization
    */
-  public void setName(String name) {
+  public boolean setName(String name) {
     this.name = name;
+    return true;
   }
 
   /**
@@ -96,7 +97,8 @@ public class Organization implements Serializable {
    *
    * @param location the new location of the organization
    */
-  public void setLocation(String location) {
+  public boolean setLocation(String location) {
     this.location = location;
+    return true;
   }
 }

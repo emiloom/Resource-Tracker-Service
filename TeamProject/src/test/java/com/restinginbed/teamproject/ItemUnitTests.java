@@ -48,7 +48,7 @@ public class ItemUnitTests {
   }
 
   @Test
-  public void removeCountTest() {
+  public void removeCount_Fail() {
     int id = 0;
     String name = "Banana";
     int organizationId = 1;
@@ -61,9 +61,23 @@ public class ItemUnitTests {
 
     assertEquals(itemTest.getCount(), 0);
     assertEquals(result, false);
-
   }
 
+  @Test
+  public void removeCount_success() {
+    int id = 0;
+    String name = "Banana";
+    int organizationId = 1;
 
+    Item itemTest = new Item(id, name, organizationId);
+
+    itemTest.addCount(5);
+    assertEquals(itemTest.getCount(), 5);
+
+    boolean result = itemTest.removeCount(1);
+
+    assertEquals(itemTest.getCount(), 4);
+    assertEquals(result, true);
+  }
 
 }
