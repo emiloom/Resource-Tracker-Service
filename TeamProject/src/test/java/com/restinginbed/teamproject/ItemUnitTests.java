@@ -14,7 +14,7 @@ import org.springframework.test.context.ContextConfiguration;
 public class ItemUnitTests {
 
   @Test
-  public void ItemUnitTest() {
+  public void itemUnitTest() {
     int id = 1;
     String name = "Banana";
     String description = "Banana Description";

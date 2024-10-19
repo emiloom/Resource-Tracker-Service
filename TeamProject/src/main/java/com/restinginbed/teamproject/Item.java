@@ -1,9 +1,13 @@
 package com.restinginbed.teamproject;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.io.Serial;
 import java.io.Serializable;
-
-import jakarta.persistence.*;
 
 /**
  * Represents an item that is stored in an organization.
@@ -19,18 +23,22 @@ public class Item implements Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "items_id")
   private int id;
 
-  @Column(name = "name", nullable = false)
+  @Column(name = "items_name", nullable = false)
   private String name;
 
-  @Column(name = "description", nullable = false)
+  @Column(name = "items_description", nullable = false)
   private String description;
 
-  @Column(name = "count")
+  @Column(name = "quantity_available", nullable = false)
   private int count;
 
-  @Column(name = "organizationId", nullable = false)
+  @Column(name = "items_location", nullable = false)
+  private String location;
+
+  @Column(name = "organization_id", nullable = false)
   private int organizationId;   //organization identified by its unique id rather than its name
 
 
@@ -82,20 +90,49 @@ public class Item implements Serializable {
     this.organizationId = organizationId;
   }
 
-  public int getId() { return id; }
-  public void setId(int id) { this.id = id; }
+  // no-argument constructor for JPA
+  public Item() {
+  }
 
-  public String getName() { return name; }
-  public void setName(String name) { this.name = name; }
+  public int getId() {
+    return id;
+  }
 
-  public String getDescription() { return description; }
-  public void setDescription(String description) { this.description = description; }
+  public void setId(int id) {
+    this.id = id;
+  }
 
-  public int getCount() { return count; }
-  public void setCount(int count) { this.count = count; }
+  public String getName() {
+    return name;
+  }
 
-  public int getOrganizationId() { return organizationId; }
-  public void setOrganizationId(int organization) { this.organizationId = organization; }
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public int getCount() {
+    return count;
+  }
+
+  public void setCount(int count) {
+    this.count = count;
+  }
+
+  public int getOrganizationId() {
+    return organizationId;
+  }
+
+  public void setOrganizationId(int organization) {
+    this.organizationId = organization;
+  }
 
   /**
    * Adds num to count of items.

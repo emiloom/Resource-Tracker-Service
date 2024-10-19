@@ -1,5 +1,9 @@
 package com.restinginbed.teamproject;
 
+/**
+ * A Data Transfer Object (DTO) representing a response that includes
+ * latitude and longitude coordinates.
+ */
 public class LocationResponseDataTransferObject {
   private double latitude;
   private double longitude;

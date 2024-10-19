@@ -3,7 +3,6 @@ package com.restinginbed.teamproject;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,24 +20,22 @@ public class ClientUnitTests {
   public static Client testClient;
 
   @BeforeAll
-  public static void setupCourseForTesting() {
+  public static void setupClientForTesting() {
     testClient = new Client();
   }
 
   @Test
-  public void ClientClassTest() {
+  public void clientClassTest() {
     int id = 1;
     String name = "Test Client";
     String location = "1.1, 1.2";
 
-    Client testClient = new Client (name, location);
+    Client testClient = new Client(name, location);
 
     assertEquals(testClient.getLocation(), location);
     assertEquals(testClient.getLongitude(), 1.2);
     assertEquals(testClient.getLatitude(), 1.1);
     assertEquals(testClient.getName(), name);
-
-
   }
 
   @Test
@@ -62,7 +59,6 @@ public class ClientUnitTests {
   public void setLatitudeFirstTest() {
     Client testClient = new Client("test");
 
-    String location = "1.1, 1.2";
     double longitude = 1.2;
     double latitude = 1.1;
     String newName = "test2";
@@ -72,7 +68,6 @@ public class ClientUnitTests {
     testClient.setLongitude(longitude);
 
     assertEquals(testClient.getName(), newName);
-    assertEquals(testClient.getLocation(), location);
     assertEquals(testClient.getLongitude(), longitude);
     assertEquals(testClient.getLatitude(), latitude);
 

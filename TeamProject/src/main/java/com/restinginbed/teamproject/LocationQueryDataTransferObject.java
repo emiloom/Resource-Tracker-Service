@@ -1,5 +1,8 @@
 package com.restinginbed.teamproject;
 
+/**
+ * A Data Transfer Object (DTO) for representing a location query with an associated ID.
+ */
 public class LocationQueryDataTransferObject {
   private int id;
   private String locationQuery;
@@ -9,17 +12,17 @@ public class LocationQueryDataTransferObject {
   public LocationQueryDataTransferObject(int id, String locationQuery) {
     this.id = id;
     this.locationQuery = locationQuery;
-   }
+  }
 
-   public int getId() {
+  public int getId() {
     return id;
-   }
+  }
 
-   public String getLocationQuery() {
+  public String getLocationQuery() {
     return locationQuery;
-   }
+  }
 
-   public void setLocationQuery(String locationQuery) {
+  public void setLocationQuery(String locationQuery) {
     this.locationQuery = locationQuery;
-   }
+  }
 }

@@ -8,14 +8,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
- * Unit Tests for Organization Class
+ * Unit Tests for Organization Class.
  */
 @SpringBootTest
 @ContextConfiguration
 public class OrganizationUnitTests {
   
-  private final int ORGANIZATION_ID = 1;
-  private final Item MOCK_ITEM = new Item(0, "mockItem", ORGANIZATION_ID);
+  private static final int ORGANIZATION_ID = 1;
+  private static final Item MOCK_ITEM = new Item(0, "mockItem", ORGANIZATION_ID);
 
   private static Organization testOrganization;
   
