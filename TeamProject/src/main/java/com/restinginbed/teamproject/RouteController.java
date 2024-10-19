@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class RouteController {
 
   /**
-   * rn assuming a postgreSQL db, correct db configuration, 
+   * rn assuming a postgreSQL db, correct db configuration,
    * Spring Data JPA to interact with db via repositories,
    * and entities to map classes to db tables.
    */
@@ -49,11 +49,11 @@ public class RouteController {
   @GetMapping({"/", "/index", "/home"})
   public String index() {
     return "Welcome, in order to make an API call direct your browser or Postman to an endpoint "
-        + "\n\n This can be done using the following format: \n\n http:127.0.0"
-        + ".1:8080/endpoint?arg=value";
+            + "\n\n This can be done using the following format: \n\n http:127.0.0"
+            + ".1:8080/endpoint?arg=value";
   }
 
-    
+
   /**
    * Create a new client in the database.
    */
@@ -99,16 +99,16 @@ public class RouteController {
 
   /**
    * Resolves the latitude and longitude for a given location query.
-   * 
+   *
    * @param locationQueryDataTransferObject the request body containing the location query string.
-   * @return a {@link ResponseEntity} with the resolved latitude and longitude in a 
+   * @return a {@link ResponseEntity} with the resolved latitude and longitude in a
    *         {@link LocationResponseDataTransferObject}, or an error response if resolution fails.
    */
   @PostMapping(value = "/resolveLocation", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> resolveLocation(@RequestBody LocationQueryDataTransferObject locationQueryDataTransferObject){
     try {
       String placeDetails = googlePlacesService.getPlaceDetails(locationQueryDataTransferObject.getLocationQuery());
-      
+
       ObjectMapper objectMapper = new ObjectMapper();
       JsonNode jsonNode = objectMapper.readTree(placeDetails);
       double longitude = jsonNode.path("geometry").path("location").path("lng").asDouble();
@@ -121,24 +121,24 @@ public class RouteController {
     }
   }
 
-//  /**
-//   * Create a new organization in the database using raw SQL.
-//   *
-//   * @param organization the organization to create
-//   * @return ResponseEntity containing HTTP status
-//   */
-//  @PostMapping(value = "/createOrganizationNative", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-//  public ResponseEntity<?> createOrganizationNative(@RequestBody Organization organization) {
-//    try {
-//      // Call the native query method to insert with the given ID
-//      organizationRepository.insertOrganization(organization.getId(), organization.getName(), organization.getLocation());
-//      return new ResponseEntity<>(HttpStatus.CREATED);
-//    } catch (Exception e) {
-//      // Log the error and return an error response
-//      e.printStackTrace();
-//      return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-//    }
-//  }
+  //  /**
+  //   * Create a new organization in the database using raw SQL.
+  //   *
+  //   * @param organization the organization to create
+  //   * @return ResponseEntity containing HTTP status
+  //   */
+  //  @PostMapping(value = "/createOrganizationNative", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+  //  public ResponseEntity<?> createOrganizationNative(@RequestBody Organization organization) {
+  //    try {
+  //      // Call the native query method to insert with the given ID
+  //      organizationRepository.insertOrganization(organization.getId(), organization.getName(), organization.getLocation());
+  //      return new ResponseEntity<>(HttpStatus.CREATED);
+  //    } catch (Exception e) {
+  //      // Log the error and return an error response
+  //      e.printStackTrace();
+  //      return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+  //    }
+  //  }
 
   /**
    * Returns the details of the specified client.
@@ -153,7 +153,7 @@ public class RouteController {
     try {
       Optional<Client> client = clientRepository.findById(clientID); // Use clientID directly
       return client.map(value -> new ResponseEntity<Object>(value, HttpStatus.OK))
-        .orElse(new ResponseEntity<Object>("Client not found", HttpStatus.NOT_FOUND));
+              .orElse(new ResponseEntity<Object>("Client not found", HttpStatus.NOT_FOUND));
     } catch (Exception e) {
       return handleException(e);
     }
@@ -172,7 +172,7 @@ public class RouteController {
     try {
       Optional<Item> item = itemRepository.findById(itemID);
       return item.map(value -> new ResponseEntity<Object>(value, HttpStatus.OK))
-        .orElse(new ResponseEntity<Object>("Item not found", HttpStatus.NOT_FOUND));
+              .orElse(new ResponseEntity<Object>("Item not found", HttpStatus.NOT_FOUND));
     } catch (Exception e) {
       return handleException(e);
     }
@@ -191,7 +191,7 @@ public class RouteController {
     try {
       Optional<Organization> organization = organizationRepository.findById(organizationID);
       return organization.map(value -> new ResponseEntity<Object>(value, HttpStatus.OK))
-        .orElse(new ResponseEntity<Object>("Organization not found", HttpStatus.NOT_FOUND));
+              .orElse(new ResponseEntity<Object>("Organization not found", HttpStatus.NOT_FOUND));
     } catch (Exception e) {
       return handleException(e);
     }
@@ -331,12 +331,12 @@ public class RouteController {
    */
   @GetMapping(value = "/clients", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> getAllClients() {
-      try {
-          List<Client> clients = clientRepository.findAll();
-          return new ResponseEntity<>(clients, HttpStatus.OK);
-      } catch (Exception e) {
-          return handleException(e);
-      }
+    try {
+      List<Client> clients = clientRepository.findAll();
+      return new ResponseEntity<>(clients, HttpStatus.OK);
+    } catch (Exception e) {
+      return handleException(e);
+    }
   }
 
   /**
@@ -347,18 +347,18 @@ public class RouteController {
    */
   @GetMapping(value = "/organizations", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> getAllOrganizations() {
-      try {
-          List<Organization> organizations = organizationRepository.findAll();
-          return new ResponseEntity<>(organizations, HttpStatus.OK);
-      } catch (Exception e) {
-          return handleException(e);
-      }
+    try {
+      List<Organization> organizations = organizationRepository.findAll();
+      return new ResponseEntity<>(organizations, HttpStatus.OK);
+    } catch (Exception e) {
+      return handleException(e);
+    }
   }
 
   /**
    * Retrieves a List of items owned by and organization by matching their organizationIDs
    * The organizationId field for the Items table is a foreign key from the organizations table.
-   * 
+   *
    * @param organizationID
    * @return ResponseEntity with the List of items found
    */
@@ -384,17 +384,17 @@ public class RouteController {
    */
   @GetMapping(value = "/searchItems", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> searchItems(@RequestParam String searchTerm) {
-      try {
-          Optional<List<Item>> items = Optional.of(itemRepository.findByNameContaining(searchTerm));
+    try {
+      Optional<List<Item>> items = Optional.of(itemRepository.findByNameContaining(searchTerm));
 
-          if (items.isPresent() && !items.get().isEmpty()) {
-              return new ResponseEntity<>(items.get(), HttpStatus.OK);
-          } else {
-              return new ResponseEntity<>("No items found", HttpStatus.NOT_FOUND);
-          }
-      } catch (Exception e) {
-          return handleException(e);
+      if (items.isPresent() && !items.get().isEmpty()) {
+        return new ResponseEntity<>(items.get(), HttpStatus.OK);
+      } else {
+        return new ResponseEntity<>("No items found", HttpStatus.NOT_FOUND);
       }
+    } catch (Exception e) {
+      return handleException(e);
+    }
   }
 
   /**
@@ -404,9 +404,9 @@ public class RouteController {
    * @return A {@link ResponseEntity} indicating an internal server error has occurred.
    */
   private ResponseEntity<?> handleException(Exception e) {
-      System.out.println(e.toString());
-      return new ResponseEntity<>("An error has occurred", HttpStatus.INTERNAL_SERVER_ERROR);
+    System.out.println(e.toString());
+    return new ResponseEntity<>("An error has occurred", HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
-  
+
 }
