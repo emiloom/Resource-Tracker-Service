@@ -314,29 +314,40 @@ public class RouteController {
     }
   }
 
-//  @GetMapping(value = "/organizations/{organizationID}/items", produces = MediaType.APPLICATION_JSON_VALUE)
-//  public ResponseEntity<?> getItemsByOrganization(@PathVariable Long organizationID) {
-//    try {
-//      Optional<Organization> organization = organizationRepository.findById(organizationID);
-//      if (organization.isPresent()) {
-//        return new ResponseEntity<>(organization.get().getItems(), HttpStatus.OK);
-//      } else {
-//        return new ResponseEntity<>("Organization not found", HttpStatus.NOT_FOUND);
-//      }
-//    } catch (Exception e) {
-//      return handleException(e);
-//    }
-//  }
+  /**
+   * Retrieves a List of items owned by and organization by matching their organizationIDs
+   * The organizationId field for the Items table is a foreign key from the organizations table.
+   * 
+   * @param organizationID
+   * @return ResponseEntity with the List of items found
+   */
+ @GetMapping(value = "/organizations/{organizationID}/items", produces = MediaType.APPLICATION_JSON_VALUE)
+ public ResponseEntity<?> getOrganizationItems(@PathVariable Integer organizationID) {
+   try {
+     Optional<List<Item>> items = Optional.of(itemRepository.findByOrganizationId(organizationID));
+     if (items.isPresent()) {
+       return new ResponseEntity<>(items.get(), HttpStatus.OK);
+     } else {
+       return new ResponseEntity<>("No items found", HttpStatus.NOT_FOUND);
+     }
+   } catch (Exception e) {
+     return handleException(e);
+   }
+ }
 
-  // @GetMapping(value = "/searchItems", produces = MediaType.APPLICATION_JSON_VALUE)
-  // public ResponseEntity<?> searchItems(@RequestParam String name) {
-  //   try {
-  //     List<Item> items = itemRepository.findByNameContaining(name);
-  //     return new ResponseEntity<>(items, HttpStatus.OK);
-  //   } catch (Exception e) {
-  //     return handleException(e);
-  //   }
-  // }
+  @GetMapping(value = "/searchItems", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> searchItems(@RequestParam String name) {
+    try {
+      Optional<List<Item>> items = Optional.of(itemRepository.findByNameContaining(name));
+      if (items.isPresent()) {
+        return new ResponseEntity<>(items.get(), HttpStatus.OK);
+      } else {
+        return new ResponseEntity<>("No items found", HttpStatus.NOT_FOUND);
+      }
+    } catch (Exception e) {
+      return handleException(e);
+    }
+  }
 
   private ResponseEntity<?> handleException(Exception e) {
     System.out.println(e.toString());
