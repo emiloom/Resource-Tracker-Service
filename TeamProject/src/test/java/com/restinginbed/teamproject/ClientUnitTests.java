@@ -26,7 +26,6 @@ public class ClientUnitTests {
 
   @Test
   public void clientClassTest() {
-    int id = 1;
     String name = "Test Client";
     String location = "1.1, 1.2";
 
@@ -137,9 +136,10 @@ public class ClientUnitTests {
 
     testClient.setLocation(location);
     testClient.setLongitude(longitude);
+    testClient.setLatitude(latitude);
 
     assertEquals(testClient.getLongitude(), longitude);
-
+    assertEquals(testClient.getLatitude(), latitude);
   }
 
 }
