@@ -6,7 +6,10 @@ import com.restinginbed.teamproject.jparepositories.ClientRepository;
 import com.restinginbed.teamproject.jparepositories.ItemRepository;
 import com.restinginbed.teamproject.jparepositories.OrganizationRepository;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.ArrayList;
+import java.util.HashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -200,6 +203,78 @@ public class RouteController {
     } catch (Exception e) {
         return handleException(e);
     }
+  }
+
+  /**
+   * Returns a ranked list of nearest organizations by distance from the given origin entity.
+   *
+   * @param originId The ID of the origin entity.
+   * @param originType The type of the origin entity ("client" or "organization").
+   * @return A {@link ResponseEntity} with the ranked list of organizations by distance or an error response.
+   */
+  @GetMapping(value = "/rankNearestOrganizations", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> rankNearestOrganizations(
+          @RequestParam(value = "originId") Integer originId,
+          @RequestParam(value = "originType") String originType) {
+      try {
+          double originLat, originLng;
+
+          // get coordinates for the origin
+          if (originType.equalsIgnoreCase("client")) {
+              Optional<Client> originClient = clientRepository.findById(originId);
+              if (originClient.isPresent()) {
+                  originLat = originClient.get().getLatitude();
+                  originLng = originClient.get().getLongitude();
+              } else {
+                  return new ResponseEntity<>("Origin client not found", HttpStatus.NOT_FOUND);
+              }
+          } else if (originType.equalsIgnoreCase("organization")) {
+              Optional<Organization> originOrganization = organizationRepository.findById(originId);
+              if (originOrganization.isPresent()) {
+                  originLat = originOrganization.get().getLatitude();
+                  originLng = originOrganization.get().getLongitude();
+              } else {
+                  return new ResponseEntity<>("Origin organization not found", HttpStatus.NOT_FOUND);
+              }
+          } else {
+              return new ResponseEntity<>("Invalid origin type", HttpStatus.BAD_REQUEST);
+          }
+
+          // retrieve all organizations
+          List<Organization> organizations = organizationRepository.findAll();
+
+          // create a map to store organization and its distance
+          Map<Organization, Double> organizationDistanceMap = new HashMap<>();
+
+          // calculate the distance between the origin and each organization
+          for (Organization organization : organizations) {
+              double destLat = organization.getLatitude();
+              double destLng = organization.getLongitude();
+              String distanceResponse = googlePlacesService.getDistanceBetweenLocations(originLat, originLng, destLat, destLng);
+
+              ObjectMapper objectMapper = new ObjectMapper();
+              JsonNode jsonNode = objectMapper.readTree(distanceResponse);
+              double distance = jsonNode.path("rows").get(0).path("elements").get(0)
+                      .path("distance").path("value").asDouble();
+
+              organizationDistanceMap.put(organization, distance);
+          }
+
+          // sort organizations by distance
+          List<Map.Entry<Organization, Double>> sortedOrganizations = new ArrayList<>(organizationDistanceMap.entrySet());
+          sortedOrganizations.sort(Map.Entry.comparingByValue());
+
+          // prepare the ranked list of organizations
+          List<OrganizationDistanceDataTransferObject> rankedOrganizations = new ArrayList<>();
+          for (Map.Entry<Organization, Double> entry : sortedOrganizations) {
+              rankedOrganizations.add(new OrganizationDistanceDataTransferObject(entry.getKey(), entry.getValue()));
+          }
+
+          return new ResponseEntity<>(rankedOrganizations, HttpStatus.OK);
+
+      } catch (Exception e) {
+          return handleException(e);
+      }
   }
 
   /**
