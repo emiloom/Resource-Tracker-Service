@@ -101,4 +101,88 @@ public class Organization implements Serializable {
     this.location = location;
     return true;
   }
+
+  /**
+   * Retrieves the longitude from the organization's location string.
+   *
+   * @return the longitude as a {@code double}
+   * @throws IllegalArgumentException if the {@code location} is null,
+   *                                  empty, or not in the correct format, or if the
+   *                                  longitude value cannot be parsed as a double.
+   */
+  public double getLongitude() {
+    if (this.location != null && !this.location.isEmpty()) {
+      String[] coordinates = this.location.split(",\\s*");
+      if (coordinates.length == 2) {
+        try {
+          return Double.parseDouble(coordinates[1].trim());
+        } catch (NumberFormatException e) {
+          throw new IllegalArgumentException("Invalid longitude value in location");
+        }
+      }
+    }
+    throw new IllegalArgumentException("Invalid location format");
+  }
+
+  /**
+   * Retrieves the latitude from the organization's location string.
+   *
+   * @return the latitude as a {@code double}
+   * @throws IllegalArgumentException if the {@code location} is null,
+   *                                  empty, or not in the correct format, or if the
+   *                                  latitude value cannot be parsed as a double.
+   */
+  public double getLatitude() {
+    if (this.location != null && !this.location.isEmpty()) {
+      String[] coordinates = this.location.split(",\\s*");
+      if (coordinates.length == 2) {
+        try {
+          return Double.parseDouble(coordinates[0].trim());
+        } catch (NumberFormatException e) {
+          throw new IllegalArgumentException("Invalid latitude value in location");
+        }
+      }
+    }
+    throw new IllegalArgumentException("Invalid location format");
+  }
+
+  /**
+   * Sets the longitude in the organization's location string.
+   *
+   * @param longitude                 the new longitude to set
+   * @throws IllegalArgumentException if the {@code location} is null,
+   *                                  empty, or not in the correct format.
+   */
+  public void setLongitude(double longitude) {
+    if (this.location != null && !this.location.isEmpty()) {
+      String[] coordinates = this.location.split(",\\s*");
+      if (coordinates.length == 2) {
+        this.location = coordinates[0] + ", " + longitude;
+      } else {
+        throw new IllegalArgumentException("Invalid location format");
+      }
+    } else {
+      this.location = "0.0, " + longitude;
+    }
+  }
+
+  /**
+   * Sets the latitude in the organization's location string.
+   *
+   * @param latitude                  the new latitude to set
+   * @throws IllegalArgumentException if the {@code location} is null,
+   *                                  empty, or not in the correct format.
+   */
+  public void setLatitude(double latitude) {
+    if (this.location != null && !this.location.isEmpty()) {
+      String[] coordinates = this.location.split(",\\s*");
+      if (coordinates.length == 2) {
+        this.location = latitude + ", " + coordinates[1];
+      } else {
+        throw new IllegalArgumentException("Invalid location format");
+      }
+    } else {
+      this.location = latitude + ", 0.0";
+    }
+  }
 }

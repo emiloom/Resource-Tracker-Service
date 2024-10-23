@@ -131,26 +131,76 @@ public class RouteController {
     }
   }
 
-  //  /**
-  //   * Create a new organization in the database using raw SQL.
-  //   *
-  //   * @param organization the organization to create
-  //   * @return ResponseEntity containing HTTP status
-  //   */
-  //  @PostMapping(value = "/createOrganizationNative", consumes = MediaType.APPLICATION_JSON_VALUE,
-  //  produces = MediaType.APPLICATION_JSON_VALUE)
-  //  public ResponseEntity<?> createOrganizationNative(@RequestBody Organization organization) {
-  //    try {
-  //      // Call the native query method to insert with the given ID
-  //      organizationRepository.insertOrganization(organization.getId(), organization.getName(),
-  //      organization.getLocation());
-  //      return new ResponseEntity<>(HttpStatus.CREATED);
-  //    } catch (Exception e) {
-  //      // Log the error and return an error response
-  //      e.printStackTrace();
-  //      return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-  //    }
-  //  }
+  /**
+   * Resolves the distance between two entities: either two clients, two organizations,
+   * or one client and one organization.
+   * 
+   * @param originId The id of the origin entity
+   * @param originType The type of the origin entity ("client" or "organization").
+   * @param destId The ID of the destination entity.
+   * @param destType The type of the destination entity ("client" or "organization").
+   * @return A {@link ResponseEntity} with the distance between the two entities or an error response.
+   */
+  @GetMapping(value = "/resolveDistance", produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> resolveDistance(
+    @RequestParam(value = "originId") Integer originId,
+    @RequestParam(value = "originType") String originType,
+    @RequestParam(value = "destId") Integer destId,
+    @RequestParam(value = "destType") String destType) {
+    try {
+      double originLat, originLng, destLat, destLng;
+
+      // get coordinates for origin
+      if (originType.equalsIgnoreCase("client")) {
+        Optional<Client> originClient = clientRepository.findById(originId);
+        if (originClient.isPresent()) {
+          originLat = originClient.get().getLatitude();
+          originLng = originClient.get().getLongitude();
+        } else {
+          return new ResponseEntity<>("Origin client not found", HttpStatus.NOT_FOUND);
+        }
+      } else if (originType.equalsIgnoreCase("organization")) {
+        Optional<Organization> originOrganization = organizationRepository.findById(originId);
+        if (originOrganization.isPresent()) {
+          originLat = originOrganization.get().getLatitude();
+          originLng = originOrganization.get().getLongitude();
+        } else {
+          return new ResponseEntity<>("Origin organization not found", HttpStatus.NOT_FOUND);
+        }
+      } else {
+        return new ResponseEntity<>("Invalid origin type", HttpStatus.BAD_REQUEST);
+      }
+
+      // get coordinates for the destination
+      if (destType.equalsIgnoreCase("client")) {
+        Optional<Client> destClient = clientRepository.findById(destId);
+        if (destClient.isPresent()) {
+          destLat = destClient.get().getLatitude();
+          destLng = destClient.get().getLongitude();
+        } else {
+          return new ResponseEntity<>("Destination client not found", HttpStatus.NOT_FOUND);
+        }
+      } else if (destType.equalsIgnoreCase("organization")) {
+        Optional<Organization> destOrganization = organizationRepository.findById(destId);
+        if (destOrganization.isPresent()) {
+          destLat = destOrganization.get().getLatitude();
+          destLng = destOrganization.get().getLongitude();
+        } else {
+          return new ResponseEntity<>("Destination organization not found", HttpStatus.NOT_FOUND);
+        }
+      } else {
+        return new ResponseEntity<>("Invalid destination type", HttpStatus.BAD_REQUEST);
+      }
+
+        // calculate the distance
+      String distanceResponse = googlePlacesService.getDistanceBetweenLocations(
+        originLat, originLng, destLat, destLng);
+
+      return new ResponseEntity<>(distanceResponse, HttpStatus.OK);
+    } catch (Exception e) {
+        return handleException(e);
+    }
+  }
 
   /**
    * Returns the details of the specified client.
