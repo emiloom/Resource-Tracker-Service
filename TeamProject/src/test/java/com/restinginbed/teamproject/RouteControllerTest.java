@@ -116,17 +116,17 @@ public class RouteControllerTest {
   }
 
 
-       @Test
-       public void testSearchItems_ItemNotFound() {
-           String searchTerm = "Test";
+  @Test
+  public void testSearchItems_ItemNotFound() {
+    String searchTerm = "Test";
 
-           List<Item> itemList = List.of(new Item(0, "Test Item", 0));
+    List<Item> itemList = List.of(new Item(0, "Test Item", 0));
 
-           when(mockItemRepository.findByNameContaining(searchTerm)).thenReturn(Collections.emptyList());
+    when(mockItemRepository.findByNameContaining(searchTerm)).thenReturn(Collections.emptyList());
 
-           ResponseEntity<?> response = mockRouteController.searchItems(searchTerm);
+    ResponseEntity<?> response = mockRouteController.searchItems(searchTerm);
 
-           assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-           assertEquals("No items found", response.getBody());
-       }
+    assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    assertEquals("No items found", response.getBody());
+  }
 }
