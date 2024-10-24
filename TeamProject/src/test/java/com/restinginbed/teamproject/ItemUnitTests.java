@@ -7,7 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
- * Unit test cases for User class.
+ * Unit test cases for the User class.
  */
 @SpringBootTest
 @ContextConfiguration
