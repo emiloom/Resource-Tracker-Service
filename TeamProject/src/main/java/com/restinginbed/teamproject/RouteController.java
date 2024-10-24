@@ -66,8 +66,8 @@ public class RouteController {
     try {
       Client savedClient = clientRepository.save(client);
       return new ResponseEntity<>(savedClient, HttpStatus.CREATED);
-    } catch (Exception e) {
-      return handleException(e);
+    } catch (IllegalArgumentException e) {
+      return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -80,8 +80,8 @@ public class RouteController {
     try {
       Item savedItem = itemRepository.save(item);
       return new ResponseEntity<>(savedItem, HttpStatus.CREATED);
-    } catch (Exception e) {
-      return handleException(e);
+    } catch (IllegalArgumentException e) {
+      return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
   }
 
