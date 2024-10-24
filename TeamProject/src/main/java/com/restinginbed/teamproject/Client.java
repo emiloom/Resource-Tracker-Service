@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.io.Serial;
 import java.io.Serializable;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Represents a User that is browsing the website.
@@ -21,6 +22,7 @@ public class Client implements Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "client_id")
   private int clientId;
 
   @Column(name = "clientName")
@@ -28,6 +30,9 @@ public class Client implements Serializable {
 
   @Column(name = "clientLocation")
   private String clientLocation;
+
+  @Autowired
+  private transient GooglePlacesService googlePlacesService;
 
   /**
    * Constructs a Client using the parameters.
@@ -37,6 +42,7 @@ public class Client implements Serializable {
    */
   public Client(String name) {
     this.clientName = name;
+    this.clientLocation = "";
   }
 
   /**
@@ -47,7 +53,7 @@ public class Client implements Serializable {
    */
   public Client(String name, String location) {
     this.clientName = name;
-    this.clientLocation = location;
+    setLocationFromQuery(location);
   }
 
   // no-argument constructor for JPA
@@ -121,42 +127,16 @@ public class Client implements Serializable {
 
 
   /**
-   * Sets the longitude in the client's location string.
+   * Sets the client's location using a query string to find coordinates.
    *
-   * @param longitude                 the new longitude to set
-   * @throws IllegalArgumentException if the {@code clientLocation} is null,
-   *                                  empty, or not in the correct format.
+   * @param query the search query to find the location
    */
-  public void setLongitude(double longitude) {
-    if (this.clientLocation != null && !this.clientLocation.isEmpty()) {
-      String[] coordinates = this.clientLocation.split(",\\s*");
-      if (coordinates.length == 2) {
-        this.clientLocation = coordinates[0] + ", " + longitude;
-      } else {
-        throw new IllegalArgumentException("Invalid clientLocation format");
-      }
+  public void setLocationFromQuery(String query) {
+    String coordinates = googlePlacesService.getPlaceCoordinates(query);
+    if (coordinates.startsWith("Latitude")) {
+      this.clientLocation = coordinates.replace("Latitude: ", "").replace("Longitude: ", "");
     } else {
-      this.clientLocation = "0.0, " + longitude;
-    }
-  }
-
-  /**
-   * Sets the latitude in the client's location string.
-   *
-   * @param latitude                  the new latitude to set
-   * @throws IllegalArgumentException if the {@code clientLocation} is null,
-   *                                  empty, or not in the correct format.
-   */
-  public void setLatitude(double latitude) {
-    if (this.clientLocation != null && !this.clientLocation.isEmpty()) {
-      String[] coordinates = this.clientLocation.split(",\\s*");
-      if (coordinates.length == 2) {
-        this.clientLocation = latitude + ", " + coordinates[1];
-      } else {
-        throw new IllegalArgumentException("Invalid clientLocation format");
-      }
-    } else {
-      this.clientLocation = latitude + ", 0.0";
+      throw new IllegalArgumentException("Could not find location for the given query.");
     }
   }
 }

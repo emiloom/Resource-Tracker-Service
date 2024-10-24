@@ -3,6 +3,8 @@ package com.restinginbed.teamproject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.json.JSONObject;
+import org.json.JSONArray;
 
 /**
  * A service class that interacts with the Google Places API and Google Distance Matrix API.
@@ -42,5 +44,31 @@ public class GooglePlacesService {
     String url = DISTANCE_MATRIX_API_URL + "?origins=" + originLat + ","
             + originLng + "&destinations=" + destLat + "," + destLng + "&key=" + apiKey;
     return restTemplate.getForObject(url, String.class);
+  }
+
+  public String getPlaceCoordinates(String query) {
+    RestTemplate restTemplate = new RestTemplate();
+    
+    // get placeid
+    String autocompleteUrl = PLACES_API_URL + "?input=" + query + "&key=" + apiKey;
+    String autocompleteResponse = restTemplate.getForObject(autocompleteUrl, String.class);
+    
+    JSONObject autocompleteJson = new JSONObject(autocompleteResponse);
+    JSONArray predictions = autocompleteJson.getJSONArray("predictions");
+    if (predictions.length() == 0) {
+        return "No place found for the given query.";
+    }
+    String placeId = predictions.getJSONObject(0).getString("place_id");
+    
+    // get lat and long
+    String detailsUrl = "https://maps.googleapis.com/maps/api/place/details/json?placeid=" + placeId + "&key=" + apiKey;
+    String detailsResponse = restTemplate.getForObject(detailsUrl, String.class);
+    
+    JSONObject detailsJson = new JSONObject(detailsResponse);
+    JSONObject location = detailsJson.getJSONObject("result").getJSONObject("geometry").getJSONObject("location");
+    double latitude = location.getDouble("lat");
+    double longitude = location.getDouble("lng");
+    
+    return "Latitude: " + latitude + ", Longitude: " + longitude;
   }
 }

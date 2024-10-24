@@ -8,6 +8,8 @@ import jakarta.persistence.Id;
 import java.io.Serial;
 import java.io.Serializable;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 /**
  * Represents an organization entity with an ID, name, and location.
  */
@@ -28,6 +30,9 @@ public class Organization implements Serializable {
   @Column(name = "organization_location", nullable = false)
   private String location;
 
+  @Autowired
+  private transient GooglePlacesService googlePlacesService;
+
   /**
    * Default constructor required by JPA.
    */
@@ -42,7 +47,7 @@ public class Organization implements Serializable {
    */
   public Organization(String name, String location) {
     this.name = name;
-    this.location = location;
+    setLocationFromQuery(location);
   }
 
   /**
@@ -147,42 +152,17 @@ public class Organization implements Serializable {
   }
 
   /**
-   * Sets the longitude in the organization's location string.
+   * Sets the client's location using a query string to find coordinates.
    *
-   * @param longitude                 the new longitude to set
-   * @throws IllegalArgumentException if the {@code location} is null,
-   *                                  empty, or not in the correct format.
+   * @param query the search query to find the location
    */
-  public void setLongitude(double longitude) {
-    if (this.location != null && !this.location.isEmpty()) {
-      String[] coordinates = this.location.split(",\\s*");
-      if (coordinates.length == 2) {
-        this.location = coordinates[0] + ", " + longitude;
-      } else {
-        throw new IllegalArgumentException("Invalid location format");
-      }
+  public void setLocationFromQuery(String query) {
+    String coordinates = googlePlacesService.getPlaceCoordinates(query);
+    if (coordinates.startsWith("Latitude")) {
+      this.location = coordinates.replace("Latitude: ", "").replace("Longitude: ", "");
     } else {
-      this.location = "0.0, " + longitude;
+      throw new IllegalArgumentException("Could not find location for the given query.");
     }
   }
 
-  /**
-   * Sets the latitude in the organization's location string.
-   *
-   * @param latitude                  the new latitude to set
-   * @throws IllegalArgumentException if the {@code location} is null,
-   *                                  empty, or not in the correct format.
-   */
-  public void setLatitude(double latitude) {
-    if (this.location != null && !this.location.isEmpty()) {
-      String[] coordinates = this.location.split(",\\s*");
-      if (coordinates.length == 2) {
-        this.location = latitude + ", " + coordinates[1];
-      } else {
-        throw new IllegalArgumentException("Invalid location format");
-      }
-    } else {
-      this.location = latitude + ", 0.0";
-    }
-  }
 }

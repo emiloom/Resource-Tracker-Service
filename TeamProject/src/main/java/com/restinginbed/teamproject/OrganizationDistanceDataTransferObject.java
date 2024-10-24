@@ -13,7 +13,7 @@ public class OrganizationDistanceDataTransferObject {
     this.distance = distance;
   }
 
-  public Organization geOrganization(){
+  public Organization getOrganization(){
     return organization;
   }
 
