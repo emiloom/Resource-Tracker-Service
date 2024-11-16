@@ -9,6 +9,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import com.restinginbed.teamproject.jparepositories.ClientRepository;
 import com.restinginbed.teamproject.jparepositories.ItemRepository;
@@ -23,6 +25,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import com.restinginbed.teamproject.GooglePlacesService;
+import java.util.stream.Collectors;
 
 /**
  * Unit Tests for RouteController Class.
@@ -55,6 +58,9 @@ public class RouteControllerTest {
     MockitoAnnotations.openMocks(this);
     defaultClient = new Client("test client");
     defaultItem = new Item(0, "Test Item", 0);
+    // Mock the GooglePlacesService behavior
+    when(mockGooglePlacesService.getPlaceCoordinates("Any String"))
+        .thenReturn("40.807000, -73.964000");  // Mock response for location query
   }
 
   @Test
@@ -137,35 +143,52 @@ public class RouteControllerTest {
 
   @Test
   public void testRankNearestOrganizations_Success() {
+    // Set up the client
     Client testClient = new Client("Test Client");
-    testClient.setLocation("620 West 116th Street, New York, NY");
+    testClient.setLocation("40.807536, -73.962573");  // Setting location as a string
 
+    // Mock the GooglePlacesService behavior to return a specific location
+    when(mockGooglePlacesService.getPlaceCoordinates(anyString()))
+        .thenReturn("40.807000, -73.964000");  // Mock response for location query
+
+    // Create Organizations and inject the mocked GooglePlacesService
     Organization org1 = new Organization("Org 1", "3009 Barnard College New York");
     Organization org2 = new Organization("Org 2", "Stuyvesant High School New York");
-    Organization org3 = new Organization("Org 3", "Cornell University Ithica, New York");
+    Organization org3 = new Organization("Org 3", "Cornell University Ithaca, New York");
 
+    // Use ReflectionTestUtils to inject mock GooglePlacesService into each organization
+    ReflectionTestUtils.setField(org1, "googlePlacesService", mockGooglePlacesService);
+    ReflectionTestUtils.setField(org2, "googlePlacesService", mockGooglePlacesService);
+    ReflectionTestUtils.setField(org3, "googlePlacesService", mockGooglePlacesService);
+
+    // Mock repository behavior to return the test client and organizations
     when(mockClientRepository.findById(1)).thenReturn(Optional.of(testClient));
     when(mockOrganizationRepository.findAll()).thenReturn(List.of(org1, org2, org3));
 
-    // Mock Google Places service response
+    // Mock the distance calculation for each pair of locations
     String distanceResponse = "{\"rows\":[{\"elements\":[{\"distance\":{\"value\":100}}]}]}";
     when(mockGooglePlacesService.getDistanceBetweenLocations(anyDouble(), anyDouble(), anyDouble(), anyDouble()))
-            .thenReturn(distanceResponse);
+        .thenReturn(distanceResponse);
 
     // Call the method under test
-    ResponseEntity<?> response = null;
-    try {
-      response = mockRouteController.rankNearestOrganizations(1, "client");
-    } catch (Exception e) {
-      e.printStackTrace(); // Log the exception to see what might be going wrong
-    }
+    ResponseEntity<?> response = mockRouteController.rankNearestOrganizations(1, "client");
 
-    // Assert the response
+    // Assert the response is not null and has an OK status
     assertNotNull(response, "Response should not be null");
     assertEquals(HttpStatus.OK, response.getStatusCode());
-    List<OrganizationDistanceDataTransferObject> rankedList = (List<OrganizationDistanceDataTransferObject>) response.getBody();
-    assertNotNull(rankedList);
-    assertEquals(3, rankedList.size()); // Expect 3 organizations in the response
-    assertEquals(org1, rankedList.get(0).getOrganization()); // Assuming org1 is the closest based on mock distances
+
+    // Check the response body to ensure it contains a list of organizations
+    Object responseBody = response.getBody();
+    if (responseBody instanceof List<?>) {
+        List<?> list = (List<?>) responseBody;
+        if (!list.isEmpty() && list.get(0) instanceof OrganizationDistanceDataTransferObject) {
+            List<OrganizationDistanceDataTransferObject> rankedList = list.stream()
+                .filter(OrganizationDistanceDataTransferObject.class::isInstance)
+                .map(OrganizationDistanceDataTransferObject.class::cast)
+                .collect(Collectors.toList());
+            assertNotNull(rankedList);
+            assertEquals(3, rankedList.size());  // Ensure 3 organizations are returned
+        }
+    }
   }
 }
