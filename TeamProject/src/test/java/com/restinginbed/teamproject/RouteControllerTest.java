@@ -10,9 +10,13 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.*;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import com.restinginbed.teamproject.jparepositories.ClientRepository;
-import com.restinginbed.teamproject.jparepositories.ItemRepository;
-import com.restinginbed.teamproject.jparepositories.OrganizationRepository;
+import com.restinginbed.teamproject.model.Client;
+import com.restinginbed.teamproject.model.Item;
+import com.restinginbed.teamproject.repository.ClientRepository;
+import com.restinginbed.teamproject.repository.ItemRepository;
+import com.restinginbed.teamproject.repository.OrganizationRepository;
+import com.restinginbed.teamproject.service.GooglePlacesService;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
