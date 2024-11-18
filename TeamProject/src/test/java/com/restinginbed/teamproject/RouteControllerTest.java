@@ -1,6 +1,7 @@
 package com.restinginbed.teamproject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -48,14 +49,14 @@ public class RouteControllerTest {
   @BeforeEach
   public void setUp() {
     MockitoAnnotations.openMocks(this);
-    defaultClient = new Client("test client");
-    defaultItem = new Item(0, "Test Item", 0);
+    defaultClient = new Client("test client", "1,1");
+    defaultItem = new Item(0, "name", "test", 10, 0);;
   }
 
   @Test
   public void testUpdateClient_Success() {
     Integer clientId = defaultClient.getId();
-    Client updatedClient = new Client("Updated Client");
+    Client updatedClient = new Client("Updated Client", "1,1");
     updatedClient.setLocation("New Location");
 
     when(mockClientRepository.existsById(clientId)).thenReturn(true);
@@ -73,7 +74,7 @@ public class RouteControllerTest {
   @Test
   public void testUpdateClient_ClientNotFound() {
     Integer clientId = 999;  // Non-existing clientId
-    Client updatedClient = new Client("Updated Client");
+    Client updatedClient = new Client("Updated Client", "1,1");
 
     when(mockClientRepository.existsById(clientId)).thenReturn(false);
 
@@ -87,7 +88,7 @@ public class RouteControllerTest {
   @Test
   public void testUpdateItem_Success() {
     Integer itemId = defaultItem.getId();
-    Item updatedItem = new Item(defaultItem.getId(), "Updated Client",
+    Item updatedItem = new Item(defaultItem.getId(), "Updated Client", "test", 10,
             defaultItem.getOrganizationId());
 
     when(mockItemRepository.existsById(itemId)).thenReturn(true);
@@ -105,7 +106,7 @@ public class RouteControllerTest {
   @Test
   public void testSearchItems_Success() {
     String searchTerm = "Test";
-    List<Item> itemList = List.of(new Item(0, "Test Item", 0));
+    List<Item> itemList = List.of(new Item(0, "Test Item", "test", 10, 0));
 
     when(mockItemRepository.findByNameContaining(searchTerm)).thenReturn(itemList);
 
@@ -120,7 +121,7 @@ public class RouteControllerTest {
   public void testSearchItems_ItemNotFound() {
     String searchTerm = "Test";
 
-    List<Item> itemList = List.of(new Item(0, "Test Item", 0));
+    List<Item> itemList = List.of(new Item(0, "name", "test", 10, 0));
 
     when(mockItemRepository.findByNameContaining(searchTerm)).thenReturn(Collections.emptyList());
 

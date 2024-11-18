@@ -14,9 +14,6 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration
 public class OrganizationUnitTests {
   
-  private static final int ORGANIZATION_ID = 1;
-  private static final Item MOCK_ITEM = new Item(0, "mockItem", ORGANIZATION_ID);
-
   private static Organization testOrganization;
   
   @BeforeAll

@@ -39,7 +39,7 @@ public class ClientUnitTests {
 
   @Test
   public void setLongitudeFirstTest() {
-    Client testClient = new Client("test");
+    Client testClient = new Client("test", "1.1, 1.2");
 
     String location = "1.1, 1.2";
     double longitude = 1.2;
@@ -56,7 +56,7 @@ public class ClientUnitTests {
 
   @Test
   public void setLatitudeFirstTest() {
-    Client testClient = new Client("test");
+    Client testClient = new Client("test", "1.2, 1.1");
 
     double longitude = 1.2;
     double latitude = 1.1;
@@ -74,7 +74,7 @@ public class ClientUnitTests {
 
   @Test
   public void setInvalidLocation() {
-    Client testClient = new Client("test");
+    Client testClient = new Client("test", "1.1, 1.2, 1.3");
 
     String location = "1.1, 1.2, 1.3";
 
@@ -92,7 +92,7 @@ public class ClientUnitTests {
 
   @Test
   public void setInvalidLocationDataType() {
-    Client testClient = new Client("test");
+    Client testClient = new Client("test", "hi, hello");
 
     String location = "hi, hello";
 
@@ -110,7 +110,7 @@ public class ClientUnitTests {
 
   @Test
   public void setNullLocation() {
-    Client testClient = new Client("test");
+    Client testClient = new Client("test", "");
 
     String location = null;
 
@@ -128,7 +128,7 @@ public class ClientUnitTests {
 
   @Test
   public void setLongitudeWhenLocationNull() {
-    Client testClient = new Client("test");
+    Client testClient = new Client("test", "1.2, 1.1");
 
     String location = null;
     double longitude = 1.2;
