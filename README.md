@@ -111,6 +111,18 @@ We used JaCoCo to perform branch analysis in order to see the branch coverage of
 
 ![Screenshot of a code coverage report from the plugin](TeamProject/jacoco-report-result.png)
 
+## PMD
+We added Maven PMD plugin to our pom.xml file and used our own ruleset. Note: our ruleset is just the default ruleset taken from https://maven.apache.org/plugins/maven-pmd-plugin/examples/usingRuleSets.html
+
+To run PMD
+```
+mvn pmd:pmd
+```
+To view results
+```
+open target/site/pmd.html
+```
+
 
 ## Project Management
 We used Trello cards to do our project management

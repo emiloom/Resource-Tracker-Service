@@ -1,13 +1,17 @@
 package com.restinginbed.teamproject;
 
+import java.io.Serial;
+import java.io.Serializable;
+
+import java.util.logging.Logger;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.io.Serial;
-import java.io.Serializable;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -34,16 +38,7 @@ public class Client implements Serializable {
   @Autowired
   private transient GooglePlacesService googlePlacesService;
 
-  /**
-   * Constructs a Client using the parameters.
-   * Initial location set to blank string
-   *
-   * @param name   name associated with Client
-   */
-  public Client(String name) {
-    this.clientName = name;
-    this.clientLocation = "";
-  }
+  public static final Logger logger = Logger.getLogger(Client.class.getName());
 
   /**
    * Constructs a Client using the parameters.
@@ -51,9 +46,16 @@ public class Client implements Serializable {
    * @param name          name associated with Client
    * @param location      location associated with Client
    */
-  public Client(String name, String location) {
+  public Client(String name, String location){
     this.clientName = name;
-    setLocationFromQuery(location);
+    this.clientLocation = location;
+
+    try {
+      getLongitude();
+      getLatitude();
+    } catch (IllegalArgumentException e) {
+      logger.info(location + ": invalid location");
+    }
   }
 
   // no-argument constructor for JPA

@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import java.util.logging.Logger;
 
 /**
  * This class contains all the API routes for the system.
@@ -47,6 +48,8 @@ public class RouteController {
   @Autowired
   private GooglePlacesService googlePlacesService;
 
+  public static final Logger logger = Logger.getLogger(RouteController.class.getName());
+
   /**
    * Redirects to the homepage.
    *
@@ -69,8 +72,8 @@ public class RouteController {
     try {
       Client savedClient = clientRepository.save(client);
       return new ResponseEntity<>(savedClient, HttpStatus.CREATED);
-    } catch (Exception e) {
-      return handleException(e);
+    } catch (IllegalArgumentException e) {
+      return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -83,8 +86,8 @@ public class RouteController {
     try {
       Item savedItem = itemRepository.save(item);
       return new ResponseEntity<>(savedItem, HttpStatus.CREATED);
-    } catch (Exception e) {
-      return handleException(e);
+    } catch (IllegalArgumentException e) {
+      return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -102,7 +105,7 @@ public class RouteController {
       return new ResponseEntity<>(savedOrganization, HttpStatus.CREATED);
     } catch (Exception e) {
       // Handle the exception appropriately
-      return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+      return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -130,7 +133,7 @@ public class RouteController {
               latitude, longitude);
       return new ResponseEntity<>(locationResponse, HttpStatus.OK);
     } catch (Exception e) {
-      return handleException(e);
+      return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -360,6 +363,8 @@ public class RouteController {
 
       Client updatedClient = clientRepository.save(existingClient);
 
+      logger.info("Client updated: ID" + clientId + "has been updated." );
+
       return new ResponseEntity<>(updatedClient, HttpStatus.OK);
     } catch (Exception e) {
       return handleException(e);
@@ -379,6 +384,7 @@ public class RouteController {
         return new ResponseEntity<>("Client not found", HttpStatus.NOT_FOUND);
       }
       clientRepository.deleteById(clientId.intValue());
+      logger.info("ClientId " + clientId + " has been updated");
       return new ResponseEntity<>("Client deleted successfully", HttpStatus.OK);
     } catch (Exception e) {
       return handleException(e);
@@ -401,6 +407,7 @@ public class RouteController {
       }
       item.setId(itemId);
       Item updatedItem = itemRepository.save(item);
+      logger.info("Item " + itemId + " has been updated");
       return new ResponseEntity<>(updatedItem, HttpStatus.OK);
     } catch (Exception e) {
       return handleException(e);
@@ -420,6 +427,7 @@ public class RouteController {
         return new ResponseEntity<>("Item not found", HttpStatus.NOT_FOUND);
       }
       itemRepository.deleteById(itemId);
+      logger.info("Item " + itemId + " has been deleted");
       return new ResponseEntity<>("Item deleted successfully", HttpStatus.OK);
     } catch (Exception e) {
       return handleException(e);
@@ -443,6 +451,7 @@ public class RouteController {
         return new ResponseEntity<>("Organization not found", HttpStatus.NOT_FOUND);
       }
       Organization updatedOrganization = organizationRepository.save(organization);
+      logger.info("Organization " + organizationId + " has been updated");
       return new ResponseEntity<>(updatedOrganization, HttpStatus.OK);
     } catch (Exception e) {
       return handleException(e);
@@ -462,6 +471,7 @@ public class RouteController {
         return new ResponseEntity<>("Organization not found", HttpStatus.NOT_FOUND);
       }
       organizationRepository.deleteById(organizationId);
+      logger.info("Organization " + organizationId + " has been deleted");
       return new ResponseEntity<>("Organization deleted successfully", HttpStatus.OK);
     } catch (Exception e) {
       return handleException(e);

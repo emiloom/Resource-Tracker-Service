@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.logging.Logger;
 
 /**
  * Represents an item that is stored in an organization.
@@ -41,37 +42,7 @@ public class Item implements Serializable {
   @Column(name = "organization_id", nullable = false)
   private int organizationId;   //organization identified by its unique id rather than its name
 
-
-  /**
-   * Constructs a new Item object with the given parameters.
-   * Initial count starts at 0 and initial description is empty
-   *
-   * @param id            unique id associated with item
-   * @param name          the name of the item
-   * @param organization  the organization this item is located in
-   */
-  public Item(int id, String name, int organization) {
-    this.id = id;
-    this.count = 0;
-    this.description = "";
-    this.organizationId = organization;
-  }
-
-  /**
-   * Constructs a new Item object with the given parameters.
-   * Initial description is empty.
-   *
-   * @param id            unique id associated with item
-   * @param name          the name of the item
-   * @param count         the count of the item
-   * @param organization  the organization this item is located in
-   */
-  public Item(int id, String name, int count, int organization) {
-    this.id = id;
-    this.count = count;
-    this.description = "";
-    this.organizationId = organization;
-  }
+  public static final Logger logger = Logger.getLogger(Item.class.getName());
 
   /**
    * Constructs a new Item object with the given parameters.
@@ -123,7 +94,9 @@ public class Item implements Serializable {
   }
 
   public void setCount(int count) {
+    int oldCount = this.count;
     this.count = count;
+    logger.info("Availability changed from " + oldCount + " to " + count);
   }
 
   public int getOrganizationId() {
@@ -141,7 +114,9 @@ public class Item implements Serializable {
    * @return      returns true if successful
    */
   public boolean addCount(int num) {
+    int oldCount = this.count;
     this.count += num;
+    logger.info("Availability changed from " + oldCount  + " to " + count);
     return true;
   }
 
@@ -153,8 +128,10 @@ public class Item implements Serializable {
    *                false if otherwise.
    */
   public boolean removeCount(int num) {
-    if (this.count >= num) {
+    int oldCount = this.count;
+    if (oldCount >= num) {
       this.count -= num;
+      logger.info("Availability changed from " + oldCount  + " to " + count);
       return true;
     }
     return false;

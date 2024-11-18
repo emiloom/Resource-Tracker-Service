@@ -7,7 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
- * Unit test cases for User class.
+ * Unit test cases for the User class.
  */
 @SpringBootTest
 @ContextConfiguration
@@ -37,7 +37,7 @@ public class ItemUnitTests {
     String name = "Banana";
     int organizationId = 1;
 
-    Item itemTest = new Item(id, name, organizationId);
+    Item itemTest = new Item(id, name, "test", 0, organizationId);
 
     assertEquals(itemTest.getCount(), 0);
 
@@ -53,7 +53,7 @@ public class ItemUnitTests {
     String name = "Banana";
     int organizationId = 1;
 
-    Item itemTest = new Item(id, name, organizationId);
+    Item itemTest = new Item(id, name, "test", 0, organizationId);
 
     assertEquals(itemTest.getCount(), 0);
 
@@ -69,7 +69,7 @@ public class ItemUnitTests {
     String name = "Banana";
     int organizationId = 1;
 
-    Item itemTest = new Item(id, name, organizationId);
+    Item itemTest = new Item(id, name,"test", 0, organizationId);
 
     itemTest.addCount(5);
     assertEquals(itemTest.getCount(), 5);
