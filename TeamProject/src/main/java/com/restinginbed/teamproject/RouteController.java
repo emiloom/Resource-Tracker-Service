@@ -2,9 +2,17 @@ package com.restinginbed.teamproject;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.restinginbed.teamproject.jparepositories.ClientRepository;
-import com.restinginbed.teamproject.jparepositories.ItemRepository;
-import com.restinginbed.teamproject.jparepositories.OrganizationRepository;
+import com.restinginbed.teamproject.model.Client;
+import com.restinginbed.teamproject.model.Item;
+import com.restinginbed.teamproject.model.Organization;
+import com.restinginbed.teamproject.repository.ClientRepository;
+import com.restinginbed.teamproject.repository.ItemRepository;
+import com.restinginbed.teamproject.repository.OrganizationRepository;
+import com.restinginbed.teamproject.service.GooglePlacesService;
+import com.restinginbed.teamproject.dto.LocationQueryDataTransferObject;
+import com.restinginbed.teamproject.dto.LocationResponseDataTransferObject;
+import com.restinginbed.teamproject.dto.OrganizationDistanceDataTransferObject;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
