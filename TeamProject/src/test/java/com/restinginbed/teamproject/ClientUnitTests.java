@@ -142,4 +142,34 @@ public class ClientUnitTests {
     assertEquals(testClient.getLatitude(), latitude);
   }
 
+  @Test
+  public void getLatitudeTestNull() {
+    Client test = new Client();
+
+    assertThrows(IllegalArgumentException.class, () -> {
+      test.getLatitude();
+    });
+
+  }
+
+  @Test
+  public void setLatitudeTestThrow() {
+    Client test = new Client("test", "1.2, 1.1, 1.3");
+
+    assertThrows(IllegalArgumentException.class, () -> {
+      test.setLatitude(4.5);
+    });
+
+  }
+
+  @Test
+  public void setLongitudeTestThrow() {
+    Client test = new Client("test", "1.2, 1.1, 1.3");
+
+    assertThrows(IllegalArgumentException.class, () -> {
+      test.setLongitude(4.5);
+    });
+
+  }
+
 }

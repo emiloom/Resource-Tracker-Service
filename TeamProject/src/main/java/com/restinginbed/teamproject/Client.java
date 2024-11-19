@@ -65,6 +65,9 @@ public class Client implements Serializable {
     return this.clientId;
   }
 
+  // Used for testing purposes
+  public void setId(Integer id) { this.clientId = id; }
+
   public void setName(String name) {
     this.clientName = name;
   }
