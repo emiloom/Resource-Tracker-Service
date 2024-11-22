@@ -3,16 +3,18 @@ import {useRef, useState} from "react";
 import SearchIcon from '@mui/icons-material/Search';
 import {Link, useLocation} from "react-router-dom";
 import ReactLoading from 'react-loading';
+import {useCookies} from "react-cookie";
 
 export default function Home() {
 
     const location = useLocation();
     const inputRef = useRef(null);
 
-    const [user, setUser] = useState(location.state?.authenticated ?? null);
     const [query, setQuery] = useState("");
     const [loading, setLoading] = useState(false);
+    const [cookies, setCookies] = useCookies(['auth_token', 'exp_time']);
 
+    const user = cookies.auth_token;
 
     const handleSearchQuery = (e) => {
         e.preventDefault();
@@ -52,11 +54,11 @@ export default function Home() {
                     </Button>
                     {
                         user &&
-                        <Button>
-                            <Link to="/dashboard">
+                        <Link to="/dashboard">
+                            <Button>
                                 Dashboard
-                            </Link>
-                        </Button>
+                            </Button>
+                        </Link>
                     }
                 </div>
 

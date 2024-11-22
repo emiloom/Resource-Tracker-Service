@@ -3,6 +3,8 @@ import { Route, createBrowserRouter, createRoutesFromElements, RouterProvider } 
 import Login from "./components/Login.jsx";
 import Dashboard from "./components/Dashboard.jsx";
 import OAuthCallback from "./components/OAuthCallback.jsx";
+import {CookiesProvider} from "react-cookie";
+import {Logout} from "@mui/icons-material";
 function App() {
 
     const router = createBrowserRouter(
@@ -10,16 +12,18 @@ function App() {
             <Route>
                 <Route index element={<Home />} />
                 <Route path="login" element={<Login />} />
-                <Route path="/oauth-callback" element={<OAuthCallback />} />
+                <Route path="oauth-callback" element={<OAuthCallback />} />
                 <Route path="dashboard" element={<Dashboard />} />
+                <Route path="logout" element={<Logout />} />
             </Route>
-                // <Route path="register" element={<Register />} />
         )
     )
 
   return (
       <>
-          <RouterProvider router={router}/>
+          <CookiesProvider defaultSetOptions={{path: '/'}}>
+              <RouterProvider router={router}/>
+          </CookiesProvider>
       </>
   )
 }

@@ -1,9 +1,11 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
+import {useCookies} from "react-cookie";
 
 const OAuthButton = () => {
     const navigate = useNavigate();
+    const [cookies, setCookies] = useCookies(['auth_token', 'exp_time']);
 
     const handleOAuthSubmit = () => {
         const googleClientId = "667083991765-8egqcnldoa0m80c7kpm1q4korlbmvn91.apps.googleusercontent.com";
@@ -24,7 +26,8 @@ const OAuthButton = () => {
 
             const data = event.data;
             if (data) {
-
+                setCookies('auth_token', data.accessToken);
+                setCookies('exp_time', data.expiresIn);
                 navigate("/dashboard");
             }
         };

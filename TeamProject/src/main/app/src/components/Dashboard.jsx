@@ -3,12 +3,26 @@ import { Dropdown } from '@mui/base/Dropdown';
 import { MenuButton } from '@mui/base/MenuButton';
 import { Menu } from '@mui/base/Menu';
 import { MenuItem } from '@mui/base/MenuItem';
-import { useState } from "react";
+import {useEffect, useState} from "react";
+import {useCookies} from "react-cookie";
+import {Link, useNavigate} from "react-router-dom";
+import Logout from "./Logout.jsx";
 
 
 export default function Dashboard () {
 
-    const [selectedFilter, setSelectedFilter] = useState("Filters")
+    const [cookies, setCookies] = useCookies(['auth_token', 'exp_time']);
+    const [selectedFilter, setSelectedFilter] = useState("Filters");
+
+    const navigate = useNavigate();
+
+    const user = cookies.auth_token;
+
+    useEffect(() => {
+        if (!user) {
+            navigate('/login');
+        }
+    }, [user]);
 
     const createHandleMenuClick = (menuItem) => {
         return () => {
@@ -22,13 +36,54 @@ export default function Dashboard () {
     }
 
     return (
-        <div
-            className="w-screen h-screen flex"
-        >
+        <>
             <header
-                className="w-full h-10 flex justify-between m-4"
+                className="border-b-2 border-b-black ~h-12 flex items-center justify-between"
             >
-                <div>
+                <div
+                    className="flex gap-5 m-5"
+                >
+                    <Link to="/">
+                        <Button>
+                            Search
+                        </Button>
+                    </Link>
+                    {
+                        user &&
+                        <Link to="/dashboard">
+                            <Button>
+                                Dashboard
+                            </Button>
+                        </Link>
+                    }
+                </div>
+
+
+                <div
+                    className="flex gap-5 m-5"
+                >
+                    {
+                        user ?
+                            <Logout /> :
+                            <Button
+                                variant="contained"
+                            >
+                                <Link
+                                    to={'/login'}
+                                >
+                                    Login
+                                </Link>
+                            </Button>
+                    }
+                </div>
+            </header>
+
+            <div
+                className="flex"
+            >
+                <div
+                    className="w-full h-10 flex justify-between m-4"
+                >
                     <Dropdown>
                         <MenuButton
                             className="hover: cursor-pointer p-2"
@@ -63,11 +118,11 @@ export default function Dashboard () {
                 >
                     Add
                 </Button>
-            </header>
+            </div>
 
             <div>
 
             </div>
-        </div>
+        </>
     )
 }
