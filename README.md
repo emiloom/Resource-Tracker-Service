@@ -120,7 +120,7 @@ mvn pmd:pmd
 ```
 To view results
 ```
-open target/site/pmd.html
+open target/reports/pmd.html
 ```
 
 
