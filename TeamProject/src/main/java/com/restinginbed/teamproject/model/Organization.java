@@ -8,9 +8,6 @@ import jakarta.persistence.Id;
 import java.io.Serial;
 import java.io.Serializable;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.restinginbed.teamproject.service.GooglePlacesService;
 
 /**
  * Represents an organization entity with an ID, name, and location.
@@ -32,13 +29,15 @@ public class Organization implements Serializable {
   @Column(name = "organization_location", nullable = false)
   private String location;
 
-  @Autowired
-  private transient GooglePlacesService googlePlacesService;
+  private double latitude;
+  private double longitude;
 
   /**
    * Default constructor required by JPA.
    */
   public Organization() {
+    this.name = "";
+    this.location = "";
   }
 
   /**
@@ -49,7 +48,7 @@ public class Organization implements Serializable {
    */
   public Organization(String name, String location) {
     this.name = name;
-    setLocationFromQuery(location);
+    this.location = location;
   }
 
   /**
@@ -58,8 +57,7 @@ public class Organization implements Serializable {
    * @param name the name of the organization
    */
   public Organization(String name) {
-    this.name = name;
-    this.location = "";
+    this(name, "");
   }
 
   /**
@@ -69,6 +67,15 @@ public class Organization implements Serializable {
    */
   public int getOrganizationId() {
     return organizationId;
+  }
+
+  /**
+   * Sets the id of the organization.
+   * 
+   * @param id the new id of the organization.
+   */
+  public void setOrganizationId(int id) {
+    this.organizationId = id;
   }
 
   /**
@@ -85,9 +92,8 @@ public class Organization implements Serializable {
    *
    * @param name the new name of the organization
    */
-  public boolean setName(String name) {
+  public void setName(String name) {
     this.name = name;
-    return true;
   }
 
   /**
@@ -99,72 +105,24 @@ public class Organization implements Serializable {
     return location;
   }
 
-  /**
-   * Sets the location of the organization.
-   *
-   * @param location the new location of the organization
-   */
-  public boolean setLocation(String location) {
+  public void setLocation(String location) {
     this.location = location;
-    return true;
-  }
+}
 
-  /**
-   * Retrieves the longitude from the organization's location string.
-   *
-   * @return the longitude as a {@code double}
-   * @throws IllegalArgumentException if the {@code location} is null,
-   *                                  empty, or not in the correct format, or if the
-   *                                  longitude value cannot be parsed as a double.
-   */
-  public double getLongitude() {
-    if (this.location != null && !this.location.isEmpty()) {
-      String[] coordinates = this.location.split(",\\s*");
-      if (coordinates.length == 2) {
-        try {
-          return Double.parseDouble(coordinates[1].trim());
-        } catch (NumberFormatException e) {
-          throw new IllegalArgumentException("Invalid longitude value in location");
-        }
-      }
-    }
-    throw new IllegalArgumentException("Invalid location format");
-  }
+public double getLatitude() {
+    return latitude;
+}
 
-  /**
-   * Retrieves the latitude from the organization's location string.
-   *
-   * @return the latitude as a {@code double}
-   * @throws IllegalArgumentException if the {@code location} is null,
-   *                                  empty, or not in the correct format, or if the
-   *                                  latitude value cannot be parsed as a double.
-   */
-  public double getLatitude() {
-    if (this.location != null && !this.location.isEmpty()) {
-      String[] coordinates = this.location.split(",\\s*");
-      if (coordinates.length == 2) {
-        try {
-          return Double.parseDouble(coordinates[0].trim());
-        } catch (NumberFormatException e) {
-          throw new IllegalArgumentException("Invalid latitude value in location");
-        }
-      }
-    }
-    throw new IllegalArgumentException("Invalid location format");
-  }
+public void setLatitude(double latitude) {
+    this.latitude = latitude;
+}
 
-  /**
-   * Sets the client's location using a query string to find coordinates.
-   *
-   * @param query the search query to find the location
-   */
-  public void setLocationFromQuery(String query) {
-    String coordinates = googlePlacesService.getPlaceCoordinates(query);
-    if (coordinates.startsWith("Latitude")) {
-      this.location = coordinates.replace("Latitude: ", "").replace("Longitude: ", "");
-    } else {
-      throw new IllegalArgumentException("Could not find location for the given query.");
-    }
-  }
+public double getLongitude() {
+    return longitude;
+}
+
+public void setLongitude(double longitude) {
+    this.longitude = longitude;
+}
 
 }

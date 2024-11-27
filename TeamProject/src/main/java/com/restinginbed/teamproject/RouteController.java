@@ -9,6 +9,8 @@ import com.restinginbed.teamproject.repository.ClientRepository;
 import com.restinginbed.teamproject.repository.ItemRepository;
 import com.restinginbed.teamproject.repository.OrganizationRepository;
 import com.restinginbed.teamproject.service.GooglePlacesService;
+import com.restinginbed.teamproject.service.OrganizationService;
+import com.restinginbed.teamproject.service.ClientService;
 import com.restinginbed.teamproject.dto.LocationQueryDataTransferObject;
 import com.restinginbed.teamproject.dto.LocationResponseDataTransferObject;
 import com.restinginbed.teamproject.dto.OrganizationDistanceDataTransferObject;
@@ -18,6 +20,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Comparator;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -56,6 +62,12 @@ public class RouteController {
   @Autowired
   private GooglePlacesService googlePlacesService;
 
+  @Autowired
+  private OrganizationService organizationService;
+
+  @Autowired
+  private ClientService clientService;
+
   public static final Logger logger = Logger.getLogger(RouteController.class.getName());
 
   /**
@@ -78,6 +90,7 @@ public class RouteController {
           produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> createClient(@RequestBody Client client) {
     try {
+      clientService.updateOrganizationCoordinates(client);
       Client savedClient = clientRepository.save(client);
       return new ResponseEntity<>(savedClient, HttpStatus.CREATED);
     } catch (IllegalArgumentException e) {
@@ -109,10 +122,10 @@ public class RouteController {
           produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> createOrganization(@RequestBody Organization organization) {
     try {
+      organizationService.updateOrganizationCoordinates(organization);
       Organization savedOrganization = organizationRepository.save(organization);
       return new ResponseEntity<>(savedOrganization, HttpStatus.CREATED);
     } catch (Exception e) {
-      // Handle the exception appropriately
       return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
   }
@@ -185,6 +198,11 @@ public class RouteController {
         return new ResponseEntity<>("Invalid origin type", HttpStatus.BAD_REQUEST);
       }
 
+      // Validate coordinates for origin
+      if (!isValidCoordinates(originLat, originLng)) {
+        return new ResponseEntity<>("Invalid location format", HttpStatus.BAD_REQUEST);
+      }
+
       // get coordinates for the destination
       if (destType.equalsIgnoreCase("client")) {
         Optional<Client> destClient = clientRepository.findById(destId);
@@ -206,8 +224,13 @@ public class RouteController {
         return new ResponseEntity<>("Invalid destination type", HttpStatus.BAD_REQUEST);
       }
 
+      // Validate coordinates for destination
+      if (!isValidCoordinates(destLat, destLng)) {
+        return new ResponseEntity<>("Invalid location format", HttpStatus.BAD_REQUEST);
+      }
+
         // calculate the distance
-      String distanceResponse = googlePlacesService.getDistanceBetweenLocations(
+      double distanceResponse = googlePlacesService.getDistanceBetweenLocations(
         originLat, originLng, destLat, destLng);
 
       return new ResponseEntity<>(distanceResponse, HttpStatus.OK);
@@ -216,77 +239,76 @@ public class RouteController {
     }
   }
 
-  /**
-   * Returns a ranked list of nearest organizations by distance from the given origin entity.
-   *
-   * @param originId The ID of the origin entity.
-   * @param originType The type of the origin entity ("client" or "organization").
-   * @return A {@link ResponseEntity} with the ranked list of organizations by distance or an error response.
-   */
+  private boolean isValidCoordinates(double lat, double lng) {
+    return (lat >= -90 && lat <= 90) && (lng >= -180 && lng <= 180);
+  }
+
   @GetMapping(value = "/rankNearestOrganizations", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> rankNearestOrganizations(
-          @RequestParam(value = "originId") Integer originId,
-          @RequestParam(value = "originType") String originType) {
-      try {
-          double originLat, originLng;
+        @RequestParam(value = "originId") Integer originId,
+        @RequestParam(value = "originType") String originType) {
+    try {
+        // Get origin coordinates
+        double originLat, originLng;
+        if (originType.equalsIgnoreCase("client")) {
+            Optional<Client> originClient = clientRepository.findById(originId);
+            if (originClient.isEmpty()) {
+                return new ResponseEntity<>("Origin client not found", HttpStatus.NOT_FOUND);
+            }
+            originLat = originClient.get().getLatitude();
+            originLng = originClient.get().getLongitude();
+        } else if (originType.equalsIgnoreCase("organization")) {
+            Optional<Organization> originOrganization = organizationRepository.findById(originId);
+            if (originOrganization.isEmpty()) {
+                return new ResponseEntity<>("Origin organization not found", HttpStatus.NOT_FOUND);
+            }
+            originLat = originOrganization.get().getLatitude();
+            originLng = originOrganization.get().getLongitude();
+        } else {
+            return new ResponseEntity<>("Invalid origin type", HttpStatus.BAD_REQUEST);
+        }
 
-          // get coordinates for the origin
-          if (originType.equalsIgnoreCase("client")) {
-              Optional<Client> originClient = clientRepository.findById(originId);
-              if (originClient.isPresent()) {
-                  originLat = originClient.get().getLatitude();
-                  originLng = originClient.get().getLongitude();
-              } else {
-                  return new ResponseEntity<>("Origin client not found", HttpStatus.NOT_FOUND);
-              }
-          } else if (originType.equalsIgnoreCase("organization")) {
-              Optional<Organization> originOrganization = organizationRepository.findById(originId);
-              if (originOrganization.isPresent()) {
-                  originLat = originOrganization.get().getLatitude();
-                  originLng = originOrganization.get().getLongitude();
-              } else {
-                  return new ResponseEntity<>("Origin organization not found", HttpStatus.NOT_FOUND);
-              }
-          } else {
-              return new ResponseEntity<>("Invalid origin type", HttpStatus.BAD_REQUEST);
-          }
+        // Retrieve all organizations
+        List<Organization> organizations = organizationRepository.findAll();
+        organizations.removeIf(org -> {
+            try {
+                org.getLatitude();
+                org.getLongitude();
+                return false; // Valid location, do not remove
+            } catch (IllegalArgumentException e) {
+                logger.warning("Invalid location format for organization ID: " + org.getOrganizationId());
+                return true; // Remove invalid organization
+            }
+        });
 
-          // retrieve all organizations
-          List<Organization> organizations = organizationRepository.findAll();
+        // Calculate distances using GooglePlacesService
+        List<OrganizationDistanceDataTransferObject> rankedDistances = new ArrayList<>();
+        for (Organization organization : organizations) {
+            try {
+                double destLat = organization.getLatitude();
+                double destLng = organization.getLongitude();
+                
+                // Call GooglePlacesService to calculate distance
+                double distanceResponse = googlePlacesService.getDistanceBetweenLocations(
+                        originLat, originLng, destLat, destLng);
 
-          // create a map to store organization and its distance
-          Map<Organization, Double> organizationDistanceMap = new HashMap<>();
+                // Add to ranked list
+                rankedDistances.add(new OrganizationDistanceDataTransferObject(organization, distanceResponse));
+            } catch (Exception e) {
+                logger.warning("Failed to calculate distance for organization ID: " + organization.getOrganizationId() +
+                               ". Error: " + e.getMessage());
+            }
+        }
 
-          // calculate the distance between the origin and each organization
-          for (Organization organization : organizations) {
-              double destLat = organization.getLatitude();
-              double destLng = organization.getLongitude();
-              String distanceResponse = googlePlacesService.getDistanceBetweenLocations(originLat, originLng, destLat, destLng);
+        // Sort by distance
+        rankedDistances.sort(Comparator.comparingDouble(OrganizationDistanceDataTransferObject::getDistance));
 
-              ObjectMapper objectMapper = new ObjectMapper();
-              JsonNode jsonNode = objectMapper.readTree(distanceResponse);
-              double distance = jsonNode.path("rows").get(0).path("elements").get(0)
-                      .path("distance").path("value").asDouble();
-
-              organizationDistanceMap.put(organization, distance);
-          }
-
-          // sort organizations by distance
-          List<Map.Entry<Organization, Double>> sortedOrganizations = new ArrayList<>(organizationDistanceMap.entrySet());
-          sortedOrganizations.sort(Map.Entry.comparingByValue());
-
-          // prepare the ranked list of organizations
-          List<OrganizationDistanceDataTransferObject> rankedOrganizations = new ArrayList<>();
-          for (Map.Entry<Organization, Double> entry : sortedOrganizations) {
-              rankedOrganizations.add(new OrganizationDistanceDataTransferObject(entry.getKey(), entry.getValue()));
-          }
-
-          return new ResponseEntity<>(rankedOrganizations, HttpStatus.OK);
-
-      } catch (Exception e) {
-          return handleException(e);
-      }
+        return new ResponseEntity<>(rankedDistances, HttpStatus.OK);
+    } catch (Exception e) {
+        return handleException(e);
+    }
   }
+
 
   /**
    * Returns the details of the specified client.
@@ -572,6 +594,4 @@ public class RouteController {
     System.out.println(e.toString());
     return new ResponseEntity<>("An error has occurred", HttpStatus.INTERNAL_SERVER_ERROR);
   }
-
-
 }

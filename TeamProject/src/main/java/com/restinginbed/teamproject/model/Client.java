@@ -28,19 +28,19 @@ public class Client implements Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "client_id")
+  @Column(name = "client_id", nullable = false)
   private int clientId;
 
-  @Column(name = "clientName")
+  @Column(name = "clientName", nullable = false)
   private String clientName;
 
-  @Column(name = "clientLocation")
+  @Column(name = "clientLocation", nullable = false)
   private String clientLocation;
 
-  @Autowired
-  private transient GooglePlacesService googlePlacesService;
-
   public static final Logger logger = Logger.getLogger(Client.class.getName());
+
+  private double latitude;
+  private double longitude;
 
   /**
    * Constructs a Client using the parameters.
@@ -62,6 +62,7 @@ public class Client implements Serializable {
 
   // no-argument constructor for JPA
   public Client() {
+    this.clientName = "";
     this.clientLocation = "";
   }
 
@@ -85,62 +86,20 @@ public class Client implements Serializable {
     this.clientLocation = location;
   }
 
-  /**
-   * Retrieves the longitude from the client's location string.
-   *
-   * @return the longitude as a {@code double}
-   * @throws IllegalArgumentException if the {@code clientLocation} is null,
-   *                                  empty, or not in the correct format, or if the
-   *                                  longitude value cannot be parsed as a double.
-   */
   public double getLongitude() {
-    if (this.clientLocation != null && !this.clientLocation.isEmpty()) {
-      String[] coordinates = this.clientLocation.split(",\\s*");
-      if (coordinates.length == 2) {
-        try {
-          return Double.parseDouble(coordinates[1].trim());
-        } catch (NumberFormatException e) {
-          throw new IllegalArgumentException("Invalid longitude value in clientLocation");
-        }
-      }
-    }
-    throw new IllegalArgumentException("Invalid clientLocation format");
+    return this.longitude;
   }
 
-  /**
-   * Retrieves the latitude from the client's location string.
-   *
-   * @return                          longitude as a {@code double}
-   * @throws IllegalArgumentException if the {@code clientLocation} is null,
-   *                                  empty, or not in the correct format, or if the
-   *                                  longitude value cannot be parsed as a double.
-   */
   public double getLatitude() {
-    if (this.clientLocation != null && !this.clientLocation.isEmpty()) {
-      String[] coordinates = this.clientLocation.split(",\\s*");
-      if (coordinates.length == 2) {
-        try {
-          return Double.parseDouble(coordinates[0].trim());
-        } catch (NumberFormatException e) {
-          throw new IllegalArgumentException("Invalid latitude value in clientLocation");
-        }
-      }
-    }
-    throw new IllegalArgumentException("Invalid clientLocation format");
+    return this.latitude;
   }
 
-
-  /**
-   * Sets the client's location using a query string to find coordinates.
-   *
-   * @param query the search query to find the location
-   */
-  public void setLocationFromQuery(String query) {
-    String coordinates = googlePlacesService.getPlaceCoordinates(query);
-    if (coordinates.startsWith("Latitude")) {
-      this.clientLocation = coordinates.replace("Latitude: ", "").replace("Longitude: ", "");
-    } else {
-      throw new IllegalArgumentException("Could not find location for the given query.");
-    }
+  public void setLatitude(double latitude) {
+    this.latitude = latitude;
   }
+
+  public void setLongitude(double longitude) {
+    this.longitude = longitude;
+  }
+
 }

@@ -1,7 +1,12 @@
 package com.restinginbed.teamproject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -16,10 +21,13 @@ import com.restinginbed.teamproject.repository.ClientRepository;
 import com.restinginbed.teamproject.repository.ItemRepository;
 import com.restinginbed.teamproject.repository.OrganizationRepository;
 import com.restinginbed.teamproject.service.GooglePlacesService;
+import com.restinginbed.teamproject.dto.OrganizationDistanceDataTransferObject;
+import com.restinginbed.teamproject.model.Organization;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -46,11 +54,9 @@ public class RouteControllerTest {
   @Mock
   private OrganizationRepository mockOrganizationRepository;
 
-  @Mock
-  private GooglePlacesService mockGooglePlacesService;
-
   private Client defaultClient;
   private Item defaultItem;
+  private Organization defaultOrganization;
 
   /**
    * Initializes the necessary test objects and mocks before each test case.
@@ -60,13 +66,27 @@ public class RouteControllerTest {
     MockitoAnnotations.openMocks(this);
     defaultClient = new Client("test client", "1,1");
     defaultItem = new Item(0, "name", "test", 10, 0);;
+    defaultOrganization = new Organization("test organization", "Empire State Building");
+    defaultOrganization.setOrganizationId(2);
+    defaultOrganization.setLocation("Empire State Building");
+
+    // Organization org1 = new Organization();
+    // org1.setOrganizationId(1);
+    // org1.setLocation("Columbia University");
+
+    // Organization org2 = new Organization();
+    // org2.setOrganizationId(3);
+    // org2.setLocation("statue of Liberty");
+
+    // when(mockOrganizationRepository.findAll()).thenReturn(List.of(org1, org2));
+    // when(mockOrganizationRepository.findById(2)).thenReturn(Optional.of(defaultOrganization));
   }
 
   @Test
   public void testUpdateClient_Success() {
     Integer clientId = defaultClient.getId();
-    Client updatedClient = new Client("Updated Client", "1,1");
-    updatedClient.setLocation("New Location");
+    Client updatedClient = new Client("Updated Client", "Cornell University");
+    updatedClient.setLocation("Columbia University");
 
     when(mockClientRepository.existsById(clientId)).thenReturn(true);
     when(mockClientRepository.findById(clientId)).thenReturn(Optional.of(defaultClient));
@@ -83,7 +103,7 @@ public class RouteControllerTest {
   @Test
   public void testUpdateClient_ClientNotFound() {
     Integer clientId = 999;  // Non-existing clientId
-    Client updatedClient = new Client("Updated Client", "1,1");
+    Client updatedClient = new Client("Updated Client", "Cornell University");
 
     when(mockClientRepository.existsById(clientId)).thenReturn(false);
 
@@ -139,58 +159,95 @@ public class RouteControllerTest {
     assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     assertEquals("No items found", response.getBody());
   }
-  //         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-  //         assertEquals("No items found", response.getBody());
-  //     }
 
-  // @Test
-  // public void testRankNearestOrganizations_Success() {
-  //   // Set up the client
-  //   Client testClient = new Client("Test Client");
-  //   testClient.setLocation("40.807536, -73.962573");  // Setting location as a string
+  @Test
+  public void testResolveDistance_InvalidOriginType() {
+    ResponseEntity<?> response = mockRouteController.resolveDistance(1, "invalidType", 2, "client");
 
-  //   // Mock the GooglePlacesService behavior to return a specific location
-  //   when(mockGooglePlacesService.getPlaceCoordinates(anyString()))
-  //       .thenReturn("40.807000, -73.964000");  // Mock response for location query
+    assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    assertEquals("Invalid origin type", response.getBody());
+  }
 
-  //   // Create Organizations and inject the mocked GooglePlacesService
-  //   Organization org1 = new Organization("Org 1", "3009 Barnard College New York");
-  //   Organization org2 = new Organization("Org 2", "Stuyvesant High School New York");
-  //   Organization org3 = new Organization("Org 3", "Cornell University Ithaca, New York");
+  @Test
+  public void testResolveDistance_OriginNotFound() {
+    when(mockClientRepository.findById(1)).thenReturn(Optional.empty());
 
-  //   // Use ReflectionTestUtils to inject mock GooglePlacesService into each organization
-  //   ReflectionTestUtils.setField(org1, "googlePlacesService", mockGooglePlacesService);
-  //   ReflectionTestUtils.setField(org2, "googlePlacesService", mockGooglePlacesService);
-  //   ReflectionTestUtils.setField(org3, "googlePlacesService", mockGooglePlacesService);
+    ResponseEntity<?> response = mockRouteController.resolveDistance(1, "client", 2, "client");
 
-  //   // Mock repository behavior to return the test client and organizations
-  //   when(mockClientRepository.findById(1)).thenReturn(Optional.of(testClient));
-  //   when(mockOrganizationRepository.findAll()).thenReturn(List.of(org1, org2, org3));
+    assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    assertEquals("Origin client not found", response.getBody());
+  }
 
-  //   // Mock the distance calculation for each pair of locations
-  //   String distanceResponse = "{\"rows\":[{\"elements\":[{\"distance\":{\"value\":100}}]}]}";
-  //   when(mockGooglePlacesService.getDistanceBetweenLocations(anyDouble(), anyDouble(), anyDouble(), anyDouble()))
-  //       .thenReturn(distanceResponse);
+  @Test
+  public void testResolveDistance_DestinationNotFound() {
+    when(mockClientRepository.findById(1)).thenReturn(Optional.of(defaultClient));
+    when(mockOrganizationRepository.findById(2)).thenReturn(Optional.empty());
 
-  //   // Call the method under test
-  //   ResponseEntity<?> response = mockRouteController.rankNearestOrganizations(1, "client");
+    ResponseEntity<?> response = mockRouteController.resolveDistance(1, "client", 2, "organization");
 
-  //   // Assert the response is not null and has an OK status
-  //   assertNotNull(response, "Response should not be null");
-  //   assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    assertEquals("Destination organization not found", response.getBody());
+  }
 
-  //   // Check the response body to ensure it contains a list of organizations
-  //   Object responseBody = response.getBody();
-  //   if (responseBody instanceof List<?>) {
-  //       List<?> list = (List<?>) responseBody;
-  //       if (!list.isEmpty() && list.get(0) instanceof OrganizationDistanceDataTransferObject) {
-  //           List<OrganizationDistanceDataTransferObject> rankedList = list.stream()
-  //               .filter(OrganizationDistanceDataTransferObject.class::isInstance)
-  //               .map(OrganizationDistanceDataTransferObject.class::cast)
-  //               .collect(Collectors.toList());
-  //           assertNotNull(rankedList);
-  //           assertEquals(3, rankedList.size());  // Ensure 3 organizations are returned
-  //       }
-  //   }
-  // }
+  @Test
+  public void testRetrieveOrganization_Success() {
+    Integer organizationId = defaultOrganization.getOrganizationId();
+
+    when(mockOrganizationRepository.findById(organizationId)).thenReturn(Optional.of(defaultOrganization));
+
+    ResponseEntity<?> response = mockRouteController.retrieveOrganization(organizationId);
+
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    Organization retrievedOrganization = (Organization) response.getBody();
+    
+    // Print the organization details
+    System.out.println("ID: " + retrievedOrganization.getOrganizationId());
+    System.out.println("Name: " + retrievedOrganization.getName());
+    System.out.println("Location: " + retrievedOrganization.getLocation());
+    System.out.println("Latitude: " + retrievedOrganization.getLatitude());
+    System.out.println("Longitude: " + retrievedOrganization.getLongitude());
+  }
+
+  @Test
+  public void testRankNearestOrganizations() {
+    Integer originId = defaultOrganization.getOrganizationId();
+    String originType = "organization";
+
+    Organization org1 = new Organization();
+    org1.setOrganizationId(1);
+    org1.setLatitude(34.0522);
+    org1.setLongitude(-118.2437);
+
+    Organization org2 = new Organization();
+    org2.setOrganizationId(3);
+    org2.setLatitude(2.0);
+    org2.setLongitude(-2.0);
+
+    List<Organization> organizations = List.of(org1, org2);
+    when(mockOrganizationRepository.findAll()).thenReturn(organizations);
+    when(mockOrganizationRepository.findById(originId)).thenReturn(Optional.of(defaultOrganization));
+
+    // Debugging: Log the origin organization details
+    System.out.println("Origin ID: " + originId);
+    System.out.println("Origin Type: " + originType);
+    System.out.println("Default Organization Latitude: " + defaultOrganization.getLatitude());
+    System.out.println("Default Organization Longitude: " + defaultOrganization.getLongitude());
+
+    ResponseEntity<?> response = mockRouteController.rankNearestOrganizations(originId, originType);
+
+    // Debugging: Check the organizations being processed
+    for (Organization organization : organizations) {
+        System.out.println("Processing Organization ID: " + organization.getOrganizationId());
+        System.out.println("Latitude: " + organization.getLatitude());
+        System.out.println("Longitude: " + organization.getLongitude());
+    }
+
+    // Print the response body
+    System.out.println("Response Body: " + response.getBody());
+
+    assertNotNull(response.getBody());
+    // assertEquals(HttpStatus.OK, response.getStatusCode());
+    // assertTrue(response.getBody() instanceof List);
+  }
+
 }

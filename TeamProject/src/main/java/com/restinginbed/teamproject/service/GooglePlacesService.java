@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.json.JSONObject;
 import org.json.JSONArray;
+import java.util.List;
+import java.util.Arrays;
 
 /**
  * A service class that interacts with the Google Places API and Google Distance Matrix API.
@@ -38,15 +40,26 @@ public class GooglePlacesService {
    * @param destLng           the longitude of the destination location
    * @return                  the distance between the two locations as a JSON string
    */
-  public String getDistanceBetweenLocations(
+  public double getDistanceBetweenLocations(
           double originLat, double originLng, double destLat, double destLng) {
     RestTemplate restTemplate = new RestTemplate();
     String url = DISTANCE_MATRIX_API_URL + "?origins=" + originLat + ","
             + originLng + "&destinations=" + destLat + "," + destLng + "&key=" + apiKey;
-    return restTemplate.getForObject(url, String.class);
+    String response = restTemplate.getForObject(url, String.class);
+    
+    JSONObject jsonResponse = new JSONObject(response);
+    JSONArray rows = jsonResponse.getJSONArray("rows");
+    if (rows.length() > 0) {
+        JSONArray elements = rows.getJSONObject(0).getJSONArray("elements");
+        if (elements.length() > 0) {
+            JSONObject distance = elements.getJSONObject(0).getJSONObject("distance");
+            return distance.getDouble("value") / 1000.0; // Return the distance in kilometers as a double
+        }
+    }
+    return 0.0; // Return 0.0 if no distance found
   }
 
-  public String getPlaceCoordinates(String query) {
+  public List<Double> getPlaceCoordinates(String query) {
     RestTemplate restTemplate = new RestTemplate();
     
     // get placeid
@@ -56,7 +69,7 @@ public class GooglePlacesService {
     JSONObject autocompleteJson = new JSONObject(autocompleteResponse);
     JSONArray predictions = autocompleteJson.getJSONArray("predictions");
     if (predictions.length() == 0) {
-        return "No place found for the given query.";
+        return Arrays.asList(0.0, 0.0);
     }
     String placeId = predictions.getJSONObject(0).getString("place_id");
     
@@ -69,6 +82,6 @@ public class GooglePlacesService {
     double latitude = location.getDouble("lat");
     double longitude = location.getDouble("lng");
     
-    return "Latitude: " + latitude + ", Longitude: " + longitude;
+    return Arrays.asList(latitude, longitude);
   }
 }
