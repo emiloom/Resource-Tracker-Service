@@ -1,4 +1,4 @@
-package com.restinginbed.teamproject;
+package com.restinginbed.teamproject.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
