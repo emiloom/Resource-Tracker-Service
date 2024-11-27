@@ -248,64 +248,71 @@ public class RouteController {
         @RequestParam(value = "originId") Integer originId,
         @RequestParam(value = "originType") String originType) {
     try {
-        // Get origin coordinates
-        double originLat, originLng;
-        if (originType.equalsIgnoreCase("client")) {
-            Optional<Client> originClient = clientRepository.findById(originId);
-            if (originClient.isEmpty()) {
-                return new ResponseEntity<>("Origin client not found", HttpStatus.NOT_FOUND);
-            }
-            originLat = originClient.get().getLatitude();
-            originLng = originClient.get().getLongitude();
-        } else if (originType.equalsIgnoreCase("organization")) {
-            Optional<Organization> originOrganization = organizationRepository.findById(originId);
-            if (originOrganization.isEmpty()) {
-                return new ResponseEntity<>("Origin organization not found", HttpStatus.NOT_FOUND);
-            }
-            originLat = originOrganization.get().getLatitude();
-            originLng = originOrganization.get().getLongitude();
-        } else {
-            return new ResponseEntity<>("Invalid origin type", HttpStatus.BAD_REQUEST);
+      // Log received parameters
+      logger.info("Received originId: " + originId);
+      logger.info("Received originType: " + originType);
+      
+      // Get origin coordinates
+      double originLat, originLng;
+      if (originType.equalsIgnoreCase("client")) {
+        Optional<Client> originClient = clientRepository.findById(originId);
+        if (originClient.isEmpty()) {
+          return new ResponseEntity<>("Origin client not found", HttpStatus.NOT_FOUND);
         }
+        originLat = originClient.get().getLatitude();
+        originLng = originClient.get().getLongitude();
+      } else if (originType.equalsIgnoreCase("organization")) {
+        logger.info("Processing as organization...");
+    Optional<Organization> originOrganization = organizationRepository.findById(originId);
+    if (originOrganization.isEmpty()) {
+        logger.warning("Organization not found for ID: " + originId);
+        return new ResponseEntity<>("Origin organization not found", HttpStatus.NOT_FOUND);
+    }
+    originLat = originOrganization.get().getLatitude();
+    originLng = originOrganization.get().getLongitude();
+    logger.info("Organization found: Lat=" + originLat + ", Lng=" + originLng);
+      } else {
+        return new ResponseEntity<>("Invalid origin type", HttpStatus.BAD_REQUEST);
+      }
 
-        // Retrieve all organizations
-        List<Organization> organizations = organizationRepository.findAll();
-        organizations.removeIf(org -> {
-            try {
-                org.getLatitude();
-                org.getLongitude();
-                return false; // Valid location, do not remove
-            } catch (IllegalArgumentException e) {
-                logger.warning("Invalid location format for organization ID: " + org.getOrganizationId());
-                return true; // Remove invalid organization
-            }
-        });
-
-        // Calculate distances using GooglePlacesService
-        List<OrganizationDistanceDataTransferObject> rankedDistances = new ArrayList<>();
-        for (Organization organization : organizations) {
-            try {
-                double destLat = organization.getLatitude();
-                double destLng = organization.getLongitude();
-                
-                // Call GooglePlacesService to calculate distance
-                double distanceResponse = googlePlacesService.getDistanceBetweenLocations(
-                        originLat, originLng, destLat, destLng);
-
-                // Add to ranked list
-                rankedDistances.add(new OrganizationDistanceDataTransferObject(organization, distanceResponse));
-            } catch (Exception e) {
-                logger.warning("Failed to calculate distance for organization ID: " + organization.getOrganizationId() +
-                               ". Error: " + e.getMessage());
-            }
+      // Retrieve all organizations
+      List<Organization> organizations = organizationRepository.findAll();
+      organizations.removeIf(org -> {
+        try {
+          org.getLatitude();
+          org.getLongitude();
+          return false; // Valid location, do not remove
+        } catch (IllegalArgumentException e) {
+          logger.warning("Invalid location format for organization ID: " + org.getOrganizationId());
+          return true; // Remove invalid organization
         }
+      });
 
-        // Sort by distance
-        rankedDistances.sort(Comparator.comparingDouble(OrganizationDistanceDataTransferObject::getDistance));
+      // Calculate distances using GooglePlacesService
+      List<OrganizationDistanceDataTransferObject> rankedDistances = new ArrayList<>();
+      for (Organization organization : organizations) {
+        try {
+          double destLat = organization.getLatitude();
+          double destLng = organization.getLongitude();
+          
+          // Call GooglePlacesService to calculate distance
+          double distanceResponse = googlePlacesService.getDistanceBetweenLocations(
+                  originLat, originLng, destLat, destLng);
 
-        return new ResponseEntity<>(rankedDistances, HttpStatus.OK);
+          // Add to ranked list
+          rankedDistances.add(new OrganizationDistanceDataTransferObject(organization, distanceResponse));
+        } catch (Exception e) {
+          logger.warning("Failed to calculate distance for organization ID: " + organization.getOrganizationId() +
+                         ". Error: " + e.getMessage());
+        }
+      }
+
+      // Sort by distance
+      rankedDistances.sort(Comparator.comparingDouble(OrganizationDistanceDataTransferObject::getDistance));
+
+      return new ResponseEntity<>(rankedDistances, HttpStatus.OK);
     } catch (Exception e) {
-        return handleException(e);
+      return handleException(e);
     }
   }
 

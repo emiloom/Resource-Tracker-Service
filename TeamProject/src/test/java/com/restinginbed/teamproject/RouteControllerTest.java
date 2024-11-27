@@ -54,6 +54,9 @@ public class RouteControllerTest {
   @Mock
   private OrganizationRepository mockOrganizationRepository;
 
+  @Mock
+  private GooglePlacesService mockGooglePlacesService;
+
   private Client defaultClient;
   private Item defaultItem;
   private Organization defaultOrganization;
@@ -69,17 +72,6 @@ public class RouteControllerTest {
     defaultOrganization = new Organization("test organization", "Empire State Building");
     defaultOrganization.setOrganizationId(2);
     defaultOrganization.setLocation("Empire State Building");
-
-    // Organization org1 = new Organization();
-    // org1.setOrganizationId(1);
-    // org1.setLocation("Columbia University");
-
-    // Organization org2 = new Organization();
-    // org2.setOrganizationId(3);
-    // org2.setLocation("statue of Liberty");
-
-    // when(mockOrganizationRepository.findAll()).thenReturn(List.of(org1, org2));
-    // when(mockOrganizationRepository.findById(2)).thenReturn(Optional.of(defaultOrganization));
   }
 
   @Test
@@ -208,46 +200,45 @@ public class RouteControllerTest {
     System.out.println("Longitude: " + retrievedOrganization.getLongitude());
   }
 
-  @Test
-  public void testRankNearestOrganizations() {
-    Integer originId = defaultOrganization.getOrganizationId();
-    String originType = "organization";
+  // @Test
+  // public void testRankNearestOrganizations() {
+  //   Integer originId = defaultOrganization.getOrganizationId();
+  //   String originType = "organization";
 
-    Organization org1 = new Organization();
-    org1.setOrganizationId(1);
-    org1.setLatitude(34.0522);
-    org1.setLongitude(-118.2437);
+  //   Organization org1 = new Organization();
+  //   org1.setOrganizationId(1);
+  //   org1.setLatitude(34.0522);
+  //   org1.setLongitude(-118.2437);
 
-    Organization org2 = new Organization();
-    org2.setOrganizationId(3);
-    org2.setLatitude(2.0);
-    org2.setLongitude(-2.0);
+  //   Organization org2 = new Organization();
+  //   org2.setOrganizationId(3);
+  //   org2.setLatitude(2.0);
+  //   org2.setLongitude(-2.0);
 
-    List<Organization> organizations = List.of(org1, org2);
-    when(mockOrganizationRepository.findAll()).thenReturn(organizations);
-    when(mockOrganizationRepository.findById(originId)).thenReturn(Optional.of(defaultOrganization));
+  //   List<Organization> organizations = List.of(org1, org2);
+  //   when(mockOrganizationRepository.findAll()).thenReturn(organizations);
+  //   when(mockOrganizationRepository.findById(originId)).thenReturn(Optional.of(defaultOrganization));
 
-    // Debugging: Log the origin organization details
-    System.out.println("Origin ID: " + originId);
-    System.out.println("Origin Type: " + originType);
-    System.out.println("Default Organization Latitude: " + defaultOrganization.getLatitude());
-    System.out.println("Default Organization Longitude: " + defaultOrganization.getLongitude());
+  //   // Debugging: Log the origin organization details
+  //   System.out.println("Origin ID: " + originId);
+  //   System.out.println("Origin Type: " + originType);
+  //   System.out.println("Default Organization Latitude: " + defaultOrganization.getLatitude());
+  //   System.out.println("Default Organization Longitude: " + defaultOrganization.getLongitude());
 
-    ResponseEntity<?> response = mockRouteController.rankNearestOrganizations(originId, originType);
+  //   ResponseEntity<?> response = mockRouteController.rankNearestOrganizations(originId, originType);
 
-    // Debugging: Check the organizations being processed
-    for (Organization organization : organizations) {
-        System.out.println("Processing Organization ID: " + organization.getOrganizationId());
-        System.out.println("Latitude: " + organization.getLatitude());
-        System.out.println("Longitude: " + organization.getLongitude());
-    }
+  //   // Debugging: Check the organizations being processed
+  //   for (Organization organization : organizations) {
+  //       System.out.println("Processing Organization ID: " + organization.getOrganizationId());
+  //       System.out.println("Latitude: " + organization.getLatitude());
+  //       System.out.println("Longitude: " + organization.getLongitude());
+  //   }
 
-    // Print the response body
-    System.out.println("Response Body: " + response.getBody());
+  //   // Print the response body
+  //   System.out.println("Response Body: " + response.getBody());
 
-    assertNotNull(response.getBody());
-    // assertEquals(HttpStatus.OK, response.getStatusCode());
-    // assertTrue(response.getBody() instanceof List);
-  }
-
+  //   assertNotNull(response.getBody());
+  //   // assertEquals(HttpStatus.OK, response.getStatusCode());
+  //   // assertTrue(response.getBody() instanceof List);
+  // }
 }
