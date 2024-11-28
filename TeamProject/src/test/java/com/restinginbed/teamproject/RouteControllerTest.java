@@ -41,6 +41,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import com.restinginbed.teamproject.service.ClientService;
+import com.restinginbed.teamproject.service.OrganizationService;
+
 
 /**
  * Unit Tests for RouteController Class.
@@ -62,6 +65,12 @@ public class RouteControllerTest {
 
   @Mock
   private GooglePlacesService mockGooglePlacesService;
+
+  @Mock
+  private ClientService clientService;
+
+  @Mock
+  private OrganizationService organizationService;
 
   private Client defaultClient;
   private Item defaultItem;
@@ -330,45 +339,121 @@ public class RouteControllerTest {
     System.out.println("Longitude: " + retrievedOrganization.getLongitude());
   }
 
-  // @Test
-  // public void testRankNearestOrganizations() {
-  //   Integer originId = defaultOrganization.getOrganizationId();
-  //   String originType = "organization";
+  @Test
+  public void testRetrieveClient_Success() {
+    Integer clientId = defaultClient.getId();
 
-  //   Organization org1 = new Organization();
-  //   org1.setOrganizationId(1);
-  //   org1.setLatitude(34.0522);
-  //   org1.setLongitude(-118.2437);
+    when(mockClientRepository.findById(clientId)).thenReturn(Optional.of(defaultClient));
 
-  //   Organization org2 = new Organization();
-  //   org2.setOrganizationId(3);
-  //   org2.setLatitude(2.0);
-  //   org2.setLongitude(-2.0);
+    ResponseEntity<?> response = mockRouteController.retrieveClient(clientId);
 
-  //   List<Organization> organizations = List.of(org1, org2);
-  //   when(mockOrganizationRepository.findAll()).thenReturn(organizations);
-  //   when(mockOrganizationRepository.findById(originId)).thenReturn(Optional.of(defaultOrganization));
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals(defaultClient, response.getBody());
+  }
 
-  //   // Debugging: Log the origin organization details
-  //   System.out.println("Origin ID: " + originId);
-  //   System.out.println("Origin Type: " + originType);
-  //   System.out.println("Default Organization Latitude: " + defaultOrganization.getLatitude());
-  //   System.out.println("Default Organization Longitude: " + defaultOrganization.getLongitude());
+  @Test
+  public void testRetrieveClient_NotFound() {
+    Integer clientId = 999; // Non-existing clientId
 
-  //   ResponseEntity<?> response = mockRouteController.rankNearestOrganizations(originId, originType);
+    when(mockClientRepository.findById(clientId)).thenReturn(Optional.empty());
 
-  //   // Debugging: Check the organizations being processed
-  //   for (Organization organization : organizations) {
-  //       System.out.println("Processing Organization ID: " + organization.getOrganizationId());
-  //       System.out.println("Latitude: " + organization.getLatitude());
-  //       System.out.println("Longitude: " + organization.getLongitude());
-  //   }
+    ResponseEntity<?> response = mockRouteController.retrieveClient(clientId);
 
-  //   // Print the response body
-  //   System.out.println("Response Body: " + response.getBody());
+    assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    assertEquals("Client not found", response.getBody());
+  }
 
-  //   assertNotNull(response.getBody());
-  //   // assertEquals(HttpStatus.OK, response.getStatusCode());
-  //   // assertTrue(response.getBody() instanceof List);
-  // }
+  @Test
+  public void testCreateClient_Success() {
+    Client client = new Client();
+    client.setName("New Client");
+
+    when(mockClientRepository.save(any(Client.class))).thenReturn(client);
+
+    ResponseEntity<?> response = mockRouteController.createClient(client);
+
+    assertEquals(HttpStatus.CREATED, response.getStatusCode());
+    assertEquals(client, response.getBody());
+  }
+
+  @Test
+  public void testRetrieveItem_Success() {
+    Integer itemId = 1;
+    Item item = new Item();
+    item.setId(itemId);
+    item.setName("Test Item");
+
+    when(mockItemRepository.findById(itemId)).thenReturn(Optional.of(item));
+
+    ResponseEntity<?> response = mockRouteController.retrieveItem(itemId);
+
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals(item, response.getBody());
+  }
+
+  @Test
+  public void testRetrieveItem_NotFound() {
+    Integer itemId = 1;
+
+    when(mockItemRepository.findById(itemId)).thenReturn(Optional.empty());
+
+    ResponseEntity<?> response = mockRouteController.retrieveItem(itemId);
+
+    assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    assertEquals("Item not found", response.getBody());
+  }
+
+  @Test
+  public void testUpdateClient_NullClient() {
+    Integer clientId = defaultClient.getId();
+    ResponseEntity<?> response = mockRouteController.updateClient(clientId, null);
+    
+    assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    assertEquals("Client not found", response.getBody());
+  }
+
+  @Test
+  public void testUpdateItem_NullItem() {
+    Integer itemId = defaultItem.getId();
+    ResponseEntity<?> response = mockRouteController.updateItem(itemId, null);
+    
+    assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    assertEquals("Item not found", response.getBody());
+  }
+
+  @Test
+  public void testDeleteClient_NegativeId() {
+    int clientId = -1;
+    ResponseEntity<?> response = mockRouteController.deleteClient(clientId);
+    
+    assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    assertEquals("Client not found", response.getBody());
+  }
+
+  @Test
+  public void testDeleteItem_NegativeId() {
+    int itemId = -1;
+    ResponseEntity<?> response = mockRouteController.deleteItem(itemId);
+    
+    assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    assertEquals("Item not found", response.getBody());
+  }
+
+  @Test
+  public void testRetrieveOrganization_NegativeId() {
+    Integer orgId = -1;
+    ResponseEntity<?> response = mockRouteController.retrieveOrganization(orgId);
+    
+    assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    assertEquals("Organization not found", response.getBody());
+  }
+
+  @Test
+  public void testResolveDistance_InvalidCoordinates() {
+    ResponseEntity<?> response = mockRouteController.resolveDistance(1, "client", 2, "organization");
+    
+    assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    assertEquals("Origin client not found", response.getBody());
+  }
+
 }
