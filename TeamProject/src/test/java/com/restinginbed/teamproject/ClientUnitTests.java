@@ -1,52 +1,56 @@
 package com.restinginbed.teamproject;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import com.restinginbed.teamproject.model.Client;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
-import com.restinginbed.teamproject.model.Client;
 
-class ClientTest {
+/**
+ * Unit tests for Client class.
+ */
+class ClientUnitTests {
 
-    private Client client;
+  private Client client;
 
-    @BeforeEach
-    void setUp() {
-        client = new Client("John Doe", "New York");
-    }
+  @BeforeEach
+  void setUp() {
+    client = new Client("John Doe", "New York");
+  }
 
-    @Test
-    void testClientConstructor() {
-        assertEquals("John Doe", client.getName());
-        assertEquals("New York", client.getLocation());
-    }
+  @Test
+  void testClientConstructor() {
+    assertEquals("John Doe", client.getName());
+    assertEquals("New York", client.getLocation());
+  }
 
-    @Test
-    void testSetName() {
-        client.setName("Jane Doe");
-        assertEquals("Jane Doe", client.getName());
-    }
+  @Test
+  void testSetName() {
+    client.setName("Jane Doe");
+    assertEquals("Jane Doe", client.getName());
+  }
 
-    @Test
-    void testSetLocation() {
-        client.setLocation("Los Angeles");
-        assertEquals("Los Angeles", client.getLocation());
-    }
+  @Test
+  void testSetLocation() {
+    client.setLocation("Los Angeles");
+    assertEquals("Los Angeles", client.getLocation());
+  }
 
-    @Test
-    void testSetId() {
-        client.setId(1);
-        assertEquals(1, client.getId());
-    }
+  @Test
+  void testSetId() {
+    client.setId(1);
+    assertEquals(1, client.getId());
+  }
 
-    @Test
-    void testSetLatitude() {
-        client.setLatitude(40.7128);
-        assertEquals(40.7128, client.getLatitude());
-    }
+  @Test
+  void testSetLatitude() {
+    client.setLatitude(40.7128);
+    assertEquals(40.7128, client.getLatitude());
+  }
 
-    @Test
-    void testSetLongitude() {
-        client.setLongitude(-74.0060);
-        assertEquals(-74.0060, client.getLongitude());
-    }
+  @Test
+  void testSetLongitude() {
+    client.setLongitude(-74.0060);
+    assertEquals(-74.0060, client.getLongitude());
+  }
 }
