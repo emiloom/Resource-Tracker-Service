@@ -37,7 +37,7 @@ jobs:
           cd TeamProject
           mvn pmd:pmd
           mkdir -p reports
-          cp target/site/pmd.html reports/
+          cp target/reports/pmd.html reports/
 
       - name: Run Branch Coverage and Generate Report
         run: |
