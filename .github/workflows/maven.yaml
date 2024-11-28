@@ -1,0 +1,47 @@
+name: Team Project CI with Maven
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-and-test:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Build with Maven
+        run: mvn -B package --file IndividualProject/pom.xml
+
+      - name: Run Unit, Integration, and API Tests
+        run: cd IndividualProject && mvn clean verify
+
+      - name: Run Checkstyle and Generate Report
+        run: |
+          cd IndividualProject
+          mvn checkstyle:checkstyle
+          mkdir -p reports
+          cp target/site/checkstyle.html reports/
+
+      - name: Run Static Analysis and Generate Report
+        run: |
+          cd IndividualProject
+          mvn pmd:pmd
+          mkdir -p reports
+          cp target/site/pmd.html reports/
+
+      - name: Run Branch Coverage and Generate Report
+        run: |
+          cd IndividualProject
+          mvn jacoco:prepare-agent test jacoco:report
+          mkdir -p reports
+          cp target/site/jacoco/index.html reports/
