@@ -20,7 +20,7 @@ jobs:
           cache: 'maven'
 
       - name: Build with Maven
-        run: mvn -B package --file IndividualProject/pom.xml
+        run: mvn -B package --file TeamProject/pom.xml
 
       - name: Run Unit, Integration, and API Tests
         run: cd IndividualProject && mvn clean verify
