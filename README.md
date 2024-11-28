@@ -19,6 +19,9 @@ From there, you can right-click any of the classes present in the src/test direc
 
 To see our system-level tests, see the section "Postman Test Documentation" below.
 
+## Running the Frontend
+We created a frontend using fite and React. To run, you must build it with npm install and then npm run dev.
+
 ## Endpoints
 This section describes the endpoints that our service provides, as well as their inputs and outputs.
 Any malformed request such that there is an error in your wording or such that the API endpoint structure does not match what you are attempting to send you will receive a <code>HTTP 400 Bad Request</code> in response.
