@@ -1,4 +1,4 @@
-package com.restinginbed.teamproject;
+package com.restinginbed.teamproject.dto;
 
 /**
  * A Data Transfer Object (DTO) representing a response that includes

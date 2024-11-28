@@ -1,4 +1,4 @@
-package com.restinginbed.teamproject;
+package com.restinginbed.teamproject.dto;
 
 /**
  * A Data Transfer Object (DTO) for representing a location query with an associated ID.

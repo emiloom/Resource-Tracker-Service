@@ -1,4 +1,4 @@
-package com.restinginbed.teamproject;
+package com.restinginbed.teamproject.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

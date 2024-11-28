@@ -1,4 +1,4 @@
-package com.restinginbed.teamproject;
+package com.restinginbed.teamproject.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.io.Serial;
 import java.io.Serializable;
+
 
 /**
  * Represents an organization entity with an ID, name, and location.
@@ -28,10 +29,15 @@ public class Organization implements Serializable {
   @Column(name = "organization_location", nullable = false)
   private String location;
 
+  private double latitude;
+  private double longitude;
+
   /**
    * Default constructor required by JPA.
    */
   public Organization() {
+    this.name = "";
+    this.location = "";
   }
 
   /**
@@ -51,8 +57,7 @@ public class Organization implements Serializable {
    * @param name the name of the organization
    */
   public Organization(String name) {
-    this.name = name;
-    this.location = "";
+    this(name, "");
   }
 
   /**
@@ -62,6 +67,15 @@ public class Organization implements Serializable {
    */
   public int getOrganizationId() {
     return organizationId;
+  }
+
+  /**
+   * Sets the id of the organization.
+   * 
+   * @param id the new id of the organization.
+   */
+  public void setOrganizationId(int id) {
+    this.organizationId = id;
   }
 
   /**
@@ -78,9 +92,8 @@ public class Organization implements Serializable {
    *
    * @param name the new name of the organization
    */
-  public boolean setName(String name) {
+  public void setName(String name) {
     this.name = name;
-    return true;
   }
 
   /**
@@ -92,13 +105,24 @@ public class Organization implements Serializable {
     return location;
   }
 
-  /**
-   * Sets the location of the organization.
-   *
-   * @param location the new location of the organization
-   */
-  public boolean setLocation(String location) {
+  public void setLocation(String location) {
     this.location = location;
-    return true;
-  }
+}
+
+public double getLatitude() {
+    return latitude;
+}
+
+public void setLatitude(double latitude) {
+    this.latitude = latitude;
+}
+
+public double getLongitude() {
+    return longitude;
+}
+
+public void setLongitude(double longitude) {
+    this.longitude = longitude;
+}
+
 }
