@@ -103,6 +103,69 @@ Any malformed request such that there is an error in your wording or such that t
 * Upon Success: HTTP 200 Status Code is returned with "Item deleted successfully".
 * Upon Failure: HTTP 404 Status Code is returned with "Item not found" if the item does not exist, or HTTP 500 Status Code with "An unexpected error has occurred" for other errors.
 
+#### GET /login/oauth2/code/{provider}
+* Expected Input Parameters: provider (String), OAuth2AuthenticationToken
+* Expected Output: RedirectView to "/home"
+* Handles the OAuth2 login callback, loads the authorized client, and redirects to the home page.
+* Upon Success: Redirects to "/home"
+* Upon Failure: Appropriate error handling (not specified in the current implementation)
+
+#### PATCH /updateOrganization/{organizationId}
+* Expected Input Parameters: organizationId (Integer), organization (Organization)
+* Expected Output: Updated organization object (Organization)
+* Updates an existing organization in the system.
+* Upon Success: HTTP 200 Status Code is returned along with the updated organization object in the response body.
+* Upon Failure: HTTP 404 Status Code is returned with "Organization not found" if the organization does not exist, or HTTP 500 Internal Server Error with "An error has occurred" for other errors.
+
+#### DELETE /deleteOrganization/{organizationId}
+* Expected Input Parameters: organizationId (Integer)
+* Expected Output: Success message
+* Deletes an organization from the system.
+* Upon Success: HTTP 200 Status Code is returned with "Organization deleted successfully".
+* Upon Failure: HTTP 404 Status Code is returned with "Organization not found" if the organization does not exist, or HTTP 500 Internal Server Error with "An error has occurred" for other errors.
+
+#### GET /clients
+* Expected Input Parameters: None
+* Expected Output: List of Client objects
+* Retrieves all clients from the system.
+* Upon Success: HTTP 200 Status Code is returned along with the list of clients in the response body.
+* Upon Failure: HTTP 500 Internal Server Error with "An error has occurred" for any errors.
+
+#### GET /organizations
+* Expected Input Parameters: None
+* Expected Output: List of Organization objects
+* Retrieves all organizations from the system.
+* Upon Success: HTTP 200 Status Code is returned along with the list of organizations in the response body.
+* Upon Failure: HTTP 500 Internal Server Error with "An error has occurred" for any errors.
+
+#### GET /organizations/{organizationId}/items
+* Expected Input Parameters: organizationId (Integer)
+* Expected Output: List of Item objects
+* Retrieves all items associated with a specific organization.
+* Upon Success: HTTP 200 Status Code is returned along with the list of items in the response body.
+* Upon Failure: HTTP 404 Status Code is returned with "No items found" if no items exist for the organization, or HTTP 500 Internal Server Error with "An error has occurred" for other errors.
+
+#### GET /searchItems
+* Expected Input Parameters: searchTerm (String)
+* Expected Output: List of Item objects
+* Searches for items containing the specified search term in their names.
+* Upon Success: HTTP 200 Status Code is returned along with the list of matching items in the response body.
+* Upon Failure: HTTP 404 Status Code is returned with "No items found" if no matching items exist, or HTTP 500 Internal Server Error with "An error has occurred" for other errors.
+
+#### GET /resolveDistance
+* Expected Input Parameters: originId (Integer), originType (String), destId (Integer), destType (String)
+* Expected Output: Distance value (Double)
+* Calculates the distance between two entities (clients or organizations).
+* Upon Success: HTTP 200 Status Code is returned along with the calculated distance in the response body.
+* Upon Failure: HTTP 400 Bad Request for invalid input, HTTP 404 Not Found if entities are not found, or HTTP 500 Internal Server Error with "An error has occurred" for other errors.
+
+#### GET /rankNearestOrganizations
+* Expected Input Parameters: originId (Integer), originType (String)
+* Expected Output: List of OrganizationDistanceDataTransferObject
+* Ranks organizations based on their distance from a given origin (client or organization).
+* Upon Success: HTTP 200 Status Code is returned along with the ranked list of organizations and their distances in the response body.
+* Upon Failure: HTTP 400 Bad Request for invalid input, HTTP 404 Not Found if the origin is not found, or HTTP 500 Internal Server Error with "An error has occurred" for other errors.
+
 ## Style Checking Report
 We used the tool "checkstyle" with the configuration file "google_checks.xml" to check the style of our code and generate style checking reports. Here is the report
 as of the day of 10/18/2024 (These can be found in the reports folder):
