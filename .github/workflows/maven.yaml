@@ -23,25 +23,25 @@ jobs:
         run: mvn -B package --file TeamProject/pom.xml
 
       - name: Run Unit, Integration, and API Tests
-        run: cd IndividualProject && mvn clean verify
+        run: cd TeamProject && mvn clean verify
 
       - name: Run Checkstyle and Generate Report
         run: |
-          cd IndividualProject
+          cd TeamProject
           mvn checkstyle:checkstyle
           mkdir -p reports
           cp target/site/checkstyle.html reports/
 
       - name: Run Static Analysis and Generate Report
         run: |
-          cd IndividualProject
+          cd TeamProject
           mvn pmd:pmd
           mkdir -p reports
           cp target/site/pmd.html reports/
 
       - name: Run Branch Coverage and Generate Report
         run: |
-          cd IndividualProject
+          cd TeamProject
           mvn jacoco:prepare-agent test jacoco:report
           mkdir -p reports
           cp target/site/jacoco/index.html reports/
