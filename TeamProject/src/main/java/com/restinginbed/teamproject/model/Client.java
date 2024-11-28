@@ -12,10 +12,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.restinginbed.teamproject.service.GooglePlacesService;
-
 /**
  * Represents a User that is browsing the website.
  */
@@ -51,13 +47,6 @@ public class Client implements Serializable {
   public Client(String name, String location){
     this.clientName = name;
     this.clientLocation = location;
-
-    try {
-      getLongitude();
-      getLatitude();
-    } catch (IllegalArgumentException e) {
-      logger.info(location + ": invalid location");
-    }
   }
 
   // no-argument constructor for JPA
@@ -72,6 +61,10 @@ public class Client implements Serializable {
 
   public Integer getId() {
     return this.clientId;
+  }
+
+  public void setId(Integer newId) {
+    this.clientId = newId;
   }
 
   public void setName(String name) {
