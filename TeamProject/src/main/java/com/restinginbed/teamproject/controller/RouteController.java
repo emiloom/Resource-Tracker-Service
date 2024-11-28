@@ -1,29 +1,26 @@
 package com.restinginbed.teamproject.controller;
 
+
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.restinginbed.teamproject.dto.LocationQueryDataTransferObject;
+import com.restinginbed.teamproject.dto.LocationResponseDataTransferObject;
+import com.restinginbed.teamproject.dto.OrganizationDistanceDataTransferObject;
 import com.restinginbed.teamproject.model.Client;
 import com.restinginbed.teamproject.model.Item;
 import com.restinginbed.teamproject.model.Organization;
 import com.restinginbed.teamproject.repository.ClientRepository;
 import com.restinginbed.teamproject.repository.ItemRepository;
 import com.restinginbed.teamproject.repository.OrganizationRepository;
+import com.restinginbed.teamproject.service.ClientService;
 import com.restinginbed.teamproject.service.GooglePlacesService;
 import com.restinginbed.teamproject.service.OrganizationService;
-import com.restinginbed.teamproject.service.ClientService;
-import com.restinginbed.teamproject.dto.LocationQueryDataTransferObject;
-import com.restinginbed.teamproject.dto.LocationResponseDataTransferObject;
-import com.restinginbed.teamproject.dto.OrganizationDistanceDataTransferObject;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Comparator;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
+import java.util.List;
+import java.util.Optional;
+import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -36,7 +33,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import java.util.logging.Logger;
 
 /**
  * This class contains all the API routes for the system.
@@ -161,21 +157,24 @@ public class RouteController {
   /**
    * Resolves the distance between two entities: either two clients, two organizations,
    * or one client and one organization.
-   * 
+   *
    * @param originId The id of the origin entity
    * @param originType The type of the origin entity ("client" or "organization").
    * @param destId The ID of the destination entity.
    * @param destType The type of the destination entity ("client" or "organization").
-   * @return A {@link ResponseEntity} with the distance between the two entities or an error response.
+   * @return ResponseEntity with the distance between the two entities or an error response.
    */
   @GetMapping(value = "/resolveDistance", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> resolveDistance(
-    @RequestParam(value = "originId") Integer originId,
-    @RequestParam(value = "originType") String originType,
-    @RequestParam(value = "destId") Integer destId,
-    @RequestParam(value = "destType") String destType) {
+      @RequestParam(value = "originId") Integer originId,
+      @RequestParam(value = "originType") String originType,
+      @RequestParam(value = "destId") Integer destId,
+      @RequestParam(value = "destType") String destType) {
     try {
-      double originLat, originLng, destLat, destLng;
+      double originLat;
+      double originLng;
+      double destLat;
+      double destLng;
 
       // get coordinates for origin
       if (originType.equalsIgnoreCase("client")) {
@@ -229,13 +228,13 @@ public class RouteController {
         return new ResponseEntity<>("Invalid location format", HttpStatus.BAD_REQUEST);
       }
 
-        // calculate the distance
+      // calculate the distance
       double distanceResponse = googlePlacesService.getDistanceBetweenLocations(
-        originLat, originLng, destLat, destLng);
+          originLat, originLng, destLat, destLng);
 
       return new ResponseEntity<>(distanceResponse, HttpStatus.OK);
     } catch (Exception e) {
-        return handleException(e);
+      return handleException(e);
     }
   }
 
@@ -243,6 +242,23 @@ public class RouteController {
     return (lat >= -90 && lat <= 90) && (lng >= -180 && lng <= 180);
   }
 
+  /**
+   * Handles the ranking of organizations based on their proximity to a given origin 
+   *  (either a client or an organization). The method calculates the distance between 
+   *   the origin and all organizations in the database, sorts them by distance,
+   *   and returns the sorted list of organizations along with their calculated distances.
+   *
+   * @param originId ID of the origin (client or organization)
+   *
+   * @param originType type of the origin, which can be either "client" or "organization"
+   * 
+   * @return a ResponseEntity containing the ranked list of organizations along with their 
+   *     distances from the origin.
+   * 
+   * @throws Exception if any unexpected errors occur during the processing, 
+   *     such as database errors or failed API calls.
+   * 
+   */
   @GetMapping(value = "/rankNearestOrganizations", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> rankNearestOrganizations(
         @RequestParam(value = "originId") Integer originId,
@@ -253,7 +269,8 @@ public class RouteController {
       logger.info("Received originType: " + originType);
       
       // Get origin coordinates
-      double originLat, originLng;
+      double originLat;
+      double originLng;
       if (originType.equalsIgnoreCase("client")) {
         Optional<Client> originClient = clientRepository.findById(originId);
         if (originClient.isEmpty()) {
@@ -263,14 +280,14 @@ public class RouteController {
         originLng = originClient.get().getLongitude();
       } else if (originType.equalsIgnoreCase("organization")) {
         logger.info("Processing as organization...");
-    Optional<Organization> originOrganization = organizationRepository.findById(originId);
-    if (originOrganization.isEmpty()) {
-        logger.warning("Organization not found for ID: " + originId);
-        return new ResponseEntity<>("Origin organization not found", HttpStatus.NOT_FOUND);
-    }
-    originLat = originOrganization.get().getLatitude();
-    originLng = originOrganization.get().getLongitude();
-    logger.info("Organization found: Lat=" + originLat + ", Lng=" + originLng);
+        Optional<Organization> originOrganization = organizationRepository.findById(originId);
+        if (originOrganization.isEmpty()) {
+          logger.warning("Organization not found for ID: " + originId);
+          return new ResponseEntity<>("Origin organization not found", HttpStatus.NOT_FOUND);
+        }
+        originLat = originOrganization.get().getLatitude();
+        originLng = originOrganization.get().getLongitude();
+        logger.info("Organization found: Lat=" + originLat + ", Lng=" + originLng);
       } else {
         return new ResponseEntity<>("Invalid origin type", HttpStatus.BAD_REQUEST);
       }
@@ -300,15 +317,18 @@ public class RouteController {
                   originLat, originLng, destLat, destLng);
 
           // Add to ranked list
-          rankedDistances.add(new OrganizationDistanceDataTransferObject(organization, distanceResponse));
+          rankedDistances.add(
+              new OrganizationDistanceDataTransferObject(organization, distanceResponse));
         } catch (Exception e) {
-          logger.warning("Failed to calculate distance for organization ID: " + organization.getOrganizationId() +
-                         ". Error: " + e.getMessage());
+          logger.warning("Failed to calculate distance for organization ID: " 
+                  + organization.getOrganizationId() 
+                  + ". Error: " + e.getMessage());
         }
       }
 
       // Sort by distance
-      rankedDistances.sort(Comparator.comparingDouble(OrganizationDistanceDataTransferObject::getDistance));
+      rankedDistances.sort(
+          Comparator.comparingDouble(OrganizationDistanceDataTransferObject::getDistance));
 
       return new ResponseEntity<>(rankedDistances, HttpStatus.OK);
     } catch (Exception e) {
@@ -400,7 +420,7 @@ public class RouteController {
 
       Client updatedClient = clientRepository.save(existingClient);
 
-      logger.info("Client updated: ID" + clientId + "has been updated." );
+      logger.info("Client updated: ID" + clientId + "has been updated.");
 
       return new ResponseEntity<>(updatedClient, HttpStatus.OK);
     } catch (Exception e) {

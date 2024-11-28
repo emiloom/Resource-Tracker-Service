@@ -2,12 +2,10 @@ package com.restinginbed.teamproject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.restinginbed.teamproject.model.Item;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-
-import com.restinginbed.teamproject.model.Item;
 
 /**
  * Unit test cases for the User class.
@@ -72,7 +70,7 @@ public class ItemUnitTests {
     String name = "Banana";
     int organizationId = 1;
 
-    Item itemTest = new Item(id, name,"test", 0, organizationId);
+    Item itemTest = new Item(id, name, "test", 0, organizationId);
 
     itemTest.addCount(5);
     assertEquals(itemTest.getCount(), 5);

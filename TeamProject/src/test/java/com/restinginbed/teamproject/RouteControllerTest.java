@@ -1,21 +1,11 @@
 package com.restinginbed.teamproject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyDouble;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.*;
-
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import com.restinginbed.teamproject.model.Client;
 import com.restinginbed.teamproject.model.Item;
@@ -24,14 +14,12 @@ import com.restinginbed.teamproject.repository.ItemRepository;
 import com.restinginbed.teamproject.repository.OrganizationRepository;
 import com.restinginbed.teamproject.service.GooglePlacesService;
 import com.restinginbed.teamproject.controller.RouteController;
-import com.restinginbed.teamproject.dto.OrganizationDistanceDataTransferObject;
 import com.restinginbed.teamproject.model.Organization;
 
 import java.util.Collections;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -154,9 +142,7 @@ public class RouteControllerTest {
   @Test
   public void testSearchItems_ItemNotFound() {
     String searchTerm = "Test";
-
-    List<Item> itemList = List.of(new Item(0, "name", "test", 10, 0));
-
+    
     when(mockItemRepository.findByNameContaining(searchTerm)).thenReturn(Collections.emptyList());
 
     ResponseEntity<?> response = mockRouteController.searchItems(searchTerm);
