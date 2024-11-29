@@ -1,16 +1,14 @@
 package com.restinginbed.teamproject.model;
 
-import java.io.Serial;
-import java.io.Serializable;
-
-import java.util.logging.Logger;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.logging.Logger;
 
 /**
  * Represents a User that is browsing the website.
@@ -44,7 +42,7 @@ public class Client implements Serializable {
    * @param name          name associated with Client
    * @param location      location associated with Client
    */
-  public Client(String name, String location){
+  public Client(String name, String location) {
     this.clientName = name;
     this.clientLocation = location;
   }

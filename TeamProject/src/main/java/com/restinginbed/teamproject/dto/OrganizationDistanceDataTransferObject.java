@@ -15,7 +15,7 @@ public class OrganizationDistanceDataTransferObject {
     this.distance = distance;
   }
 
-  public Organization getOrganization(){
+  public Organization getOrganization() {
     return organization;
   }
 
@@ -23,7 +23,7 @@ public class OrganizationDistanceDataTransferObject {
     this.organization = organization;
   }
 
-  public double getDistance(){
+  public double getDistance() {
     return distance;
   }
 

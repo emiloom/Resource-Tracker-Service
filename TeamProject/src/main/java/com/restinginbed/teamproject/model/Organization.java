@@ -80,7 +80,7 @@ public class Organization implements Serializable {
 
   /**
    * Sets the id of the organization.
-   * 
+   *
    * @param id the new id of the organization.
    */
   public void setOrganizationId(int id) {
@@ -116,22 +116,22 @@ public class Organization implements Serializable {
 
   public void setLocation(String location) {
     this.location = location;
-}
+  }
 
-public double getLatitude() {
+  public double getLatitude() {
     return latitude;
-}
+  }
 
-public void setLatitude(double latitude) {
+  public void setLatitude(double latitude) {
     this.latitude = latitude;
-}
+  }
 
-public double getLongitude() {
+  public double getLongitude() {
     return longitude;
-}
+  }
 
-public void setLongitude(double longitude) {
+  public void setLongitude(double longitude) {
     this.longitude = longitude;
-}
+  }
 
 }

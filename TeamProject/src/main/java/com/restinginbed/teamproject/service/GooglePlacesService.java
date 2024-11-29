@@ -1,12 +1,12 @@
 package com.restinginbed.teamproject.service;
 
+import java.util.Arrays;
+import java.util.List;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.json.JSONObject;
-import org.json.JSONArray;
-import java.util.List;
-import java.util.Arrays;
 
 /**
  * A service class that interacts with the Google Places API and Google Distance Matrix API.
@@ -50,15 +50,22 @@ public class GooglePlacesService {
     JSONObject jsonResponse = new JSONObject(response);
     JSONArray rows = jsonResponse.getJSONArray("rows");
     if (rows.length() > 0) {
-        JSONArray elements = rows.getJSONObject(0).getJSONArray("elements");
-        if (elements.length() > 0) {
-            JSONObject distance = elements.getJSONObject(0).getJSONObject("distance");
-            return distance.getDouble("value") / 1000.0; // Return the distance in kilometers as a double
-        }
+      JSONArray elements = rows.getJSONObject(0).getJSONArray("elements");
+      if (elements.length() > 0) {
+        JSONObject distance = elements.getJSONObject(0).getJSONObject("distance");
+        // Return the distance in kilometers as a double
+        return distance.getDouble("value") / 1000.0;
+      }
     }
     return 0.0; // Return 0.0 if no distance found
   }
 
+  /**
+   * Gets coordinates based off of query.
+   *
+   * @param query     user inputted query
+   * @return          Returns latitude and longitude as list of doubles
+   */
   public List<Double> getPlaceCoordinates(String query) {
     RestTemplate restTemplate = new RestTemplate();
     
@@ -69,7 +76,7 @@ public class GooglePlacesService {
     JSONObject autocompleteJson = new JSONObject(autocompleteResponse);
     JSONArray predictions = autocompleteJson.getJSONArray("predictions");
     if (predictions.length() == 0) {
-        return Arrays.asList(0.0, 0.0);
+      return Arrays.asList(0.0, 0.0);
     }
     String placeId = predictions.getJSONObject(0).getString("place_id");
     
@@ -78,7 +85,9 @@ public class GooglePlacesService {
     String detailsResponse = restTemplate.getForObject(detailsUrl, String.class);
     
     JSONObject detailsJson = new JSONObject(detailsResponse);
-    JSONObject location = detailsJson.getJSONObject("result").getJSONObject("geometry").getJSONObject("location");
+    JSONObject location = detailsJson.getJSONObject("result")
+            .getJSONObject("geometry")
+            .getJSONObject("location");
     double latitude = location.getDouble("lat");
     double longitude = location.getDouble("lng");
     
