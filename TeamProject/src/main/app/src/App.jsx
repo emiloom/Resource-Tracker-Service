@@ -22,11 +22,11 @@ function App() {
     )
 
   return (
-      <>
+      <div className="w-screen h-screen">
           <CookiesProvider defaultSetOptions={{path: '/'}}>
               <RouterProvider router={router}/>
           </CookiesProvider>
-      </>
+      </div>
   )
 }
 
