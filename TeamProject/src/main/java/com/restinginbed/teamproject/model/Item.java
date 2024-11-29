@@ -93,6 +93,11 @@ public class Item implements Serializable {
     return count;
   }
 
+  /**
+   * Sets new count of item.
+   *
+   * @param count     new count to be set to item
+   */
   public void setCount(int count) {
     int oldCount = this.count;
     this.count = count;
