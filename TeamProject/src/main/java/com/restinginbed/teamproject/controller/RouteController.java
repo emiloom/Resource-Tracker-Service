@@ -118,8 +118,10 @@ public class RouteController {
           produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> createOrganization(@RequestBody Organization organization) {
     try {
+      System.out.println("Received Organization ID: " + organization.getOrganizationId());
       organizationService.updateOrganizationCoordinates(organization);
       Organization savedOrganization = organizationRepository.save(organization);
+      System.out.println("Saved Organization ID: " + savedOrganization.getOrganizationId());
       return new ResponseEntity<>(savedOrganization, HttpStatus.CREATED);
     } catch (Exception e) {
       return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -578,9 +580,10 @@ public class RouteController {
           produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> getOrganizationItems(@PathVariable Integer organizationId) {
     try {
-      Optional<List<Item>> items = Optional.of(itemRepository.findByOrganizationId(organizationId));
-      if (items.isPresent()) {
-        return new ResponseEntity<>(items.get(), HttpStatus.OK);
+      System.out.println(organizationId);
+      List<Item> items = itemRepository.findByOrganizationId(organizationId);
+      if (items != null && !items.isEmpty()) {
+        return new ResponseEntity<>(items, HttpStatus.OK);
       } else {
         return new ResponseEntity<>("No items found", HttpStatus.NOT_FOUND);
       }

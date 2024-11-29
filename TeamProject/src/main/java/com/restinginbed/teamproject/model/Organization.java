@@ -1,5 +1,6 @@
 package com.restinginbed.teamproject.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -19,7 +20,8 @@ public class Organization implements Serializable {
   private static final long serialVersionUID = 234567L;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+//  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @JsonProperty("id")
   @Column(name = "organization_id", nullable = false)
   private int organizationId;
 
@@ -38,6 +40,7 @@ public class Organization implements Serializable {
   public Organization() {
     this.name = "";
     this.location = "";
+    this.organizationId = 0;
   }
 
   /**
@@ -49,6 +52,12 @@ public class Organization implements Serializable {
   public Organization(String name, String location) {
     this.name = name;
     this.location = location;
+  }
+
+  public Organization(String name, String location, int id) {
+    this.name = name;
+    this.location = location;
+    this.organizationId = id;
   }
 
   /**

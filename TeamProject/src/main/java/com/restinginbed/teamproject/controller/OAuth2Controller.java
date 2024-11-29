@@ -1,12 +1,12 @@
 package com.restinginbed.teamproject.controller;
 
+import com.restinginbed.teamproject.service.GoogleAuthService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
 /**
@@ -50,5 +50,24 @@ public class OAuth2Controller {
     //JWT token for further authentication.
 
     return new RedirectView("/home");
+  }
+
+  @CrossOrigin(origins = "http://localhost:5173")
+  @GetMapping("/api/resource")
+  public ResponseEntity<?> getResource(@RequestHeader("Authorization") String authorizationHeader) {
+    System.out.println("Authorization Header: " + authorizationHeader);
+    try {
+      String token = authorizationHeader.replace("Bearer ", "");
+      System.out.println("Token: " + token);
+
+      GoogleAuthService authService = new GoogleAuthService();
+      String userId = authService.getUserIdFromToken(token);
+      System.out.println("User ID: " + userId);
+
+      return ResponseEntity.ok(userId);
+    } catch (Exception e) {
+      e.printStackTrace();
+      return ResponseEntity.status(401).body("Unauthorized: Invalid token.");
+    }
   }
 }

@@ -11,12 +11,13 @@ import Logout from "./Logout.jsx";
 
 export default function Dashboard () {
 
-    const [cookies, setCookies] = useCookies(['auth_token', 'exp_time']);
+    const [cookies, setCookies] = useCookies(['auth_token', 'exp_time', 'uid']);
     const [selectedFilter, setSelectedFilter] = useState("Filters");
+    const [userData, setUserData] = useState();
 
     const navigate = useNavigate();
 
-    const user = cookies.auth_token;
+    const user = cookies.uid;
 
     useEffect(() => {
         if (!user) {
@@ -34,6 +35,33 @@ export default function Dashboard () {
     const handleRemoveFilter = () => {
         setSelectedFilter("Filters")
     }
+
+    useEffect(() => {
+        if (!user) return;
+
+        // Cast the Long to an Integer using modulo
+        const organizationId = Number(user) % (2 ** 31);
+
+        fetch(`http://localhost:8080/organizations/${organizationId}/items`)
+            .then((response) => {
+                console.log(response.status)
+                if (response.status === 404) {
+                    console.log('not found')
+                    return null;
+                }
+                return response.json();
+            })
+            .then((data) => {
+                    setUserData(data);
+            })
+            .catch((error) => {
+                console.error("Error during fetch:", error);
+            });
+    }, [user]);
+
+    useEffect(()=> {
+        console.log('data cahnge', userData);
+    }, [userData])
 
     return (
         <>
