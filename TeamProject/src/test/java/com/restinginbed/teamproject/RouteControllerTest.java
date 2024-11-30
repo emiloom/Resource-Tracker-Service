@@ -237,6 +237,19 @@ public class RouteControllerTest {
   }
 
   @Test
+  public void testGetOrganizationItems_notFound() {
+    int orgId = -1;
+
+    List<Item> mockItems = Collections.emptyList();
+
+    when(mockItemRepository.findByOrganizationId(orgId)).thenReturn(mockItems);
+
+    ResponseEntity<?> response = mockRouteController.getOrganizationItems(orgId);
+
+    assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+  }
+
+  @Test
   public void testUpdateItemDoesntExist() {
     Integer itemId = 1;
     Item updatedItem = new Item(defaultItem.getId(), "Updated Client", "test", 10,
