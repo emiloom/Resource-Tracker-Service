@@ -61,6 +61,15 @@ public class Item implements Serializable {
     this.organizationId = organizationId;
   }
 
+  /**
+   * Constructs a new Item object with the given parameters.
+   *
+   * @param name            the name of the item
+   * @param description     the description of the item
+   * @param count           the count of the item
+   * @param organizationId  the organization this item is located in
+   * @param location        location of the item
+   */
   public Item(String name, String description, int count, int organizationId, String location) {
     this.name = name;
     this.description = description;

@@ -20,7 +20,7 @@ public class Organization implements Serializable {
   private static final long serialVersionUID = 234567L;
 
   @Id
-//  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  // @GeneratedValue(strategy = GenerationType.IDENTITY)
   @JsonProperty("id")
   @Column(name = "organization_id", nullable = false)
   private int organizationId;
@@ -54,6 +54,13 @@ public class Organization implements Serializable {
     this.location = location;
   }
 
+  /**
+   * Constructs an Organization with the specified parameters.
+   *
+   * @param name        the name of the organization
+   * @param location    the location of the organization
+   * @param id          the id of the organization
+   */
   public Organization(String name, String location, int id) {
     this.name = name;
     this.location = location;
