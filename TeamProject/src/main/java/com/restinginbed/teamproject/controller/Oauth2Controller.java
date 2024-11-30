@@ -24,6 +24,7 @@ import org.springframework.web.servlet.view.RedirectView;
  * storing user details or generating a JWT token for the user.</p>
  */
 @RestController
+@SuppressWarnings("PMD.UnusedLocalVariable")
 public class Oauth2Controller {
   private final OAuth2AuthorizedClientService clientService;
 
@@ -49,7 +50,6 @@ public class Oauth2Controller {
             authenticationToken.getAuthorizedClientRegistrationId(),
             authenticationToken.getName()
     );
-
     // Handle storing the user information and token, then redirect to a successful 
     //login page For example, store user details in your database and generate a
     //JWT token for further authentication.

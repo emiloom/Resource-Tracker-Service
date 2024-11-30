@@ -239,7 +239,7 @@ public class RouteController {
   }
 
   private boolean isValidCoordinates(double lat, double lng) {
-    return (lat >= -90 && lat <= 90) && (lng >= -180 && lng <= 180);
+    return lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180;
   }
 
   /**
