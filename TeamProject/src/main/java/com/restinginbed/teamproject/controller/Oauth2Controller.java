@@ -6,8 +6,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.view.RedirectView;
+
 
 /**
  * Controller that handles OAuth2 login success and processes the OAuth2 token
@@ -19,11 +24,11 @@ import org.springframework.web.servlet.view.RedirectView;
  * storing user details or generating a JWT token for the user.</p>
  */
 @RestController
-public class OAuth2Controller {
+public class Oauth2Controller {
   private final OAuth2AuthorizedClientService clientService;
 
   @Autowired
-  public OAuth2Controller(OAuth2AuthorizedClientService clientService) {
+  public Oauth2Controller(OAuth2AuthorizedClientService clientService) {
     this.clientService = clientService;
   }
  
@@ -38,7 +43,7 @@ public class OAuth2Controller {
    * @return redirects the user to the home page after successful login
    */
   @GetMapping("/login/oauth2/code/{provider}")
-  public RedirectView loginSuccess(@PathVariable String provider, 
+  public RedirectView loginSuccess(@PathVariable String provider,
           OAuth2AuthenticationToken authenticationToken) {
     OAuth2AuthorizedClient client = clientService.loadAuthorizedClient(
             authenticationToken.getAuthorizedClientRegistrationId(),
@@ -52,6 +57,13 @@ public class OAuth2Controller {
     return new RedirectView("/home");
   }
 
+  /**
+   * Handles a GET request to retrieve a resource.
+   *
+   * @param authorizationHeader the Authorization header containing the bearer token.
+   * @return a ResponseEntity containing the user ID if the token is valid,
+   *         or an error message with a 401 status if the token is invalid.
+   */
   @CrossOrigin(origins = "http://localhost:5173")
   @GetMapping("/api/resource")
   public ResponseEntity<?> getResource(@RequestHeader("Authorization") String authorizationHeader) {

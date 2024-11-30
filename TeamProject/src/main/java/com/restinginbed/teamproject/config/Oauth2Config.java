@@ -1,5 +1,6 @@
 package com.restinginbed.teamproject.config;
 
+import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,20 +9,31 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
-import org.springframework.security.oauth2.core.oidc.IdTokenClaimNames;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.security.oauth2.core.oidc.IdTokenClaimNames;
 import org.springframework.security.web.SecurityFilterChain;
 
-import java.util.Arrays;
-
+/**
+ * Configuration class for setting up OAuth2 authentication in the application.
+ *
+ * <p>This class defines the necessary beans and methods to configure OAuth2
+ * authentication with Google as the identity provider. It includes the
+ * client registration details and the security filter chain for handling
+ * OAuth2 login.
+ */
 @Configuration
-public class OAuth2Config {
+public class Oauth2Config {
   @Value("${spring.security.oauth2.client.registration.google.client-id}")
   private String googleClientId;
 
   @Value("${spring.security.oauth2.client.registration.google.client-secret}")
   private String googleClientSecret;
 
+  /**
+   * Configures a repository for managing OAuth2 client registrations.
+   *
+   * @return a repository containing the Google client registration.
+   */
   @Bean
   public ClientRegistrationRepository clientRegistrationRepository() {
     return new InMemoryClientRegistrationRepository(Arrays.asList(
@@ -45,35 +57,26 @@ public class OAuth2Config {
             .build();
   }
 
-//  @Bean
-//  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//    http
-//            .authorizeHttpRequests(authorize -> authorize
-//                    .requestMatchers("/api/protected").authenticated()
-//                    .anyRequest().permitAll()
-//            )
-//
-//            .oauth2Login(oauth2 -> oauth2
-//                    .loginPage("/oauth2/authorization/google")
-//            );
-//
-//    return http.build();
-//  }
-
+  /**
+   * Configures the security filter chain for the application.
+   *
+   * <p>Disables CSRF protection and allows all requests. Configures OAuth2
+   * login with a custom login page for Google authentication.
+   *
+   * @param http the HttpSecurity object to configure security settings.
+   * @return the configured SecurityFilterChain.
+   */
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
-            .csrf(csrf -> csrf.disable())  // Properly disabling CSRF
+            .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authorize -> authorize
-                    .anyRequest().permitAll()  // Allow all requests
+                    .anyRequest().permitAll()
             )
-
             .oauth2Login(oauth2 -> oauth2
                     .loginPage("/oauth2/authorization/google")
-            );
+        );
     return http.build();
   }
-
-
 
 }
