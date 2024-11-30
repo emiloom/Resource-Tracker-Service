@@ -13,8 +13,6 @@
 .git
 .gitignore
 
+src/main/app/node_modules
 # Target directory for maven builds
 target/
-
-# Node Modules for Frontend
-src/main/app/node_modules/
