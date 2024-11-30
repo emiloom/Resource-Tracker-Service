@@ -61,6 +61,14 @@ public class Item implements Serializable {
     this.organizationId = organizationId;
   }
 
+  public Item(String name, String description, int count, int organizationId, String location) {
+    this.name = name;
+    this.description = description;
+    this.count = count;
+    this.organizationId = organizationId;
+    this.location = location;
+  }
+
   // no-argument constructor for JPA
   public Item() {
   }
@@ -91,6 +99,14 @@ public class Item implements Serializable {
 
   public int getCount() {
     return count;
+  }
+
+  public void setLocation(String location) {
+    this.location = location;
+  }
+
+  public String getLocation() {
+    return location;
   }
 
   /**
