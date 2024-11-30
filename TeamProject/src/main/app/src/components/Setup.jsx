@@ -41,7 +41,7 @@ export default function Setup() {
             location: `${location}`
         };
 
-        return fetch('http://localhost:8080/createOrganization', {
+        return fetch('https://restinginbed.ue.r.appspot.com/createOrganization', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

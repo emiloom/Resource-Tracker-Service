@@ -29,7 +29,7 @@ const OAuthButton = () => {
                 setCookies('exp_time', data.expiresIn);
 
                 // get uid with auth_token
-                fetch('http://localhost:8080/api/resource', {
+                fetch('https://restinginbed.ue.r.appspot.com/api/resource', {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${data.accessToken}`,
@@ -43,7 +43,7 @@ const OAuthButton = () => {
                         const organizationId = Number(userId) % (2 ** 31);
 
                         // check if uid is of an existing org
-                        return fetch(`http://localhost:8080/retrieveOrganization?organizationId=${organizationId}`, {
+                        return fetch(`https://restinginbed.ue.r.appspot.com/retrieveOrganization?organizationId=${organizationId}`, {
                             method: 'GET',
                         });
                     })

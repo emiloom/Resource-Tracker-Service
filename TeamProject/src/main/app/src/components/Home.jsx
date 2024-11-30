@@ -21,7 +21,7 @@ export default function Home() {
     useEffect(() => {
         const fetchOrganizations = async () => {
             try {
-                const response = await fetch('http://localhost:8080/organizations');
+                const response = await fetch('https://restinginbed.ue.r.appspot.com/organizations');
                 if (!response.ok) throw new Error('Failed to fetch organizations');
                 const orgs = await response.json();
                 const orgMap = orgs.reduce((acc, org) => {
@@ -45,7 +45,7 @@ export default function Home() {
         e.preventDefault();
         setLoading(true);
         try {
-            const response = await fetch(`http://localhost:8080/searchItems?searchTerm=${query}`);
+            const response = await fetch(`https://restinginbed.ue.r.appspot.com/searchItems?searchTerm=${query}`);
             if (!response.ok) throw new Error('Search failed');
             const data = await response.json();
             setItems(data);

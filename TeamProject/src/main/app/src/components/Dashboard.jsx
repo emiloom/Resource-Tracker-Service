@@ -136,7 +136,7 @@ export default function Dashboard () {
         }
 
         setLoading(true);
-        fetch('http://localhost:8080/createItem', {
+        fetch('https://restinginbed.ue.r.appspot.com/createItem', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -204,7 +204,7 @@ export default function Dashboard () {
                 return;
             }
 
-            const response = await fetch(`http://localhost:8080/deleteItem/${objId}`, {
+            const response = await fetch(`https://restinginbed.ue.r.appspot.com/deleteItem/${objId}`, {
                 method: 'DELETE',
             });
 
@@ -298,7 +298,7 @@ export default function Dashboard () {
         };
 
         setLoading(true);
-        fetch(`http://localhost:8080/updateItem/${editObj}`, {
+        fetch(`https://restinginbed.ue.r.appspot.com/updateItem/${editObj}`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -336,7 +336,7 @@ export default function Dashboard () {
 
         const organizationId = Number(user) % (2 ** 31);
 
-        fetch(`http://localhost:8080/organizations/${organizationId}/items`)
+        fetch(`https://restinginbed.ue.r.appspot.com/organizations/${organizationId}/items`)
             .then((response) => {
                 if (response.status === 404) {
                     return null;
