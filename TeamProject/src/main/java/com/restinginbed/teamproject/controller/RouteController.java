@@ -118,10 +118,8 @@ public class RouteController {
           produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> createOrganization(@RequestBody Organization organization) {
     try {
-      System.out.println("Received Organization ID: " + organization.getOrganizationId());
       organizationService.updateOrganizationCoordinates(organization);
       Organization savedOrganization = organizationRepository.save(organization);
-      System.out.println("Saved Organization ID: " + savedOrganization.getOrganizationId());
       return new ResponseEntity<>(savedOrganization, HttpStatus.CREATED);
     } catch (Exception e) {
       return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
