@@ -214,3 +214,15 @@ This section includes notes on tools and technologies used in building this proj
 
 ## Third Party API Documentation
 We made extensive use of the Google Maps API, particularly the Places API for location-based services and plan to integrate the Distance Matrix API to calculate distances and travel times. Here is a link to the full documentation provided by Google on how to use the various components, which gives insight into how we are managing this aspect of the project: https://developers.google.com/maps/documentation
+
+## How Third Parties Can Use Our Service
+Third parties can use our service by integrating with our RESTful API. Key features include:
+
+* User, organization, and item management (create, retrieve, update, delete)
+* Location-based services using Google Places API
+* OAuth2 authentication for secure access
+* Search functionality for items
+* Distance calculation between entities
+* Ranking of nearest organizations
+
+Developers should use a language capable of making HTTP requests, host the service on their own hardware, and follow our API documentation for endpoint usage and error handling. Our service is built with Spring Boot and uses PostgreSQL for data storage.
