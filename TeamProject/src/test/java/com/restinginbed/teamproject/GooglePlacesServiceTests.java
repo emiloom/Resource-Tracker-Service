@@ -26,16 +26,6 @@ import org.springframework.web.client.RestTemplate;
 @ContextConfiguration
 public class GooglePlacesServiceTests {
 
-  @Autowired
-  private GooglePlacesService googlePlacesService;
-
-  // @Test
-  // public void testGetPlaceDetails() {
-  //     String query = "Empire State Building";
-  //     String response = googlePlacesService.getPlaceDetails(query);
-  //     // System.out.println("Place Details: " + response);
-  // }
-
   @Test
   public void testGetDistanceBetweenLocations() {
     double originLat = 40.748817; // Empire State Building
@@ -49,10 +39,7 @@ public class GooglePlacesServiceTests {
     assertNotNull(response);
     System.out.println("Distance: " + response);
   }
-}
 
-// New test class for GooglePlacesService
-class GooglePlacesServiceTest {
 
   @Mock
   private RestTemplate restTemplate;
@@ -65,21 +52,6 @@ class GooglePlacesServiceTest {
     MockitoAnnotations.openMocks(this);
     googlePlacesService = new GooglePlacesService();
   }
-
-  // @Test
-  // void testGetPlaceDetails_Success() {
-  //     // Arrange
-  //     String query = "New York";
-  //     String mockResponse = "{\"predictions\": [{\"description\": \"New York, NY\"}]}";
-  //     when(restTemplate.getForObject(anyString(), eq(String.class))).thenReturn(mockResponse);
-
-  //     // Act
-  //     String response = googlePlacesService.getPlaceDetails(query);
-
-  //     // Assert
-  //     assertNotNull(response);
-  //     assertTrue(response.contains("New York"));
-  // }
 
   @Test
   void testGetDistanceBetweenLocations_Success() {
@@ -176,25 +148,6 @@ class GooglePlacesServiceTest {
     assertEquals(0.0, coordinates.get(0));
     assertEquals(0.0, coordinates.get(1));
   }
-
-  // @Test
-  // void testGetPlaceCoordinates_InvalidResponse() {
-  // Arrange
-  // String query = "Invalid Response";
-  // String mockAutocompleteResponse = "{\"predictions\": [{\"place_id\": \"abc123\"}]}";
-  // String mockDetailsResponse = "{}";
-  // when(restTemplate.getForObject(contains("autocomplete"), 
-  //  eq(String.class))).thenReturn(mockAutocompleteResponse);
-  // when(restTemplate.getForObject(contains("details"), 
-  //  eq(String.class))).thenReturn(mockDetailsResponse);
-
-  // Act
-  // Exception exception = assertThrows(Exception.class, 
-  //   () -> googlePlacesService.getPlaceCoordinates(query));
-
-  // // Assert
-  // assertNotNull(exception);
-  // }
 
   @Test
   void testGetDistanceBetweenLocations_EmptyElements() {

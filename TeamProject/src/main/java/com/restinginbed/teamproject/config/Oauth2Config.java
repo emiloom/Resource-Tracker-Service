@@ -15,7 +15,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import java.util.Arrays;
 
 @Configuration
-public class OAuth2Config {
+public class Oauth2Config {
   @Value("${spring.security.oauth2.client.registration.google.client-id}")
   private String googleClientId;
 

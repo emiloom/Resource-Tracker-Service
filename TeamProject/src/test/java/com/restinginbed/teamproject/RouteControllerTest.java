@@ -2,7 +2,6 @@ package com.restinginbed.teamproject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.Mockito.never;
@@ -10,18 +9,19 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.restinginbed.teamproject.controller.RouteController;
+import com.restinginbed.teamproject.dto.OrganizationDistanceDataTransferObject;
 import com.restinginbed.teamproject.model.Client;
 import com.restinginbed.teamproject.model.Item;
+import com.restinginbed.teamproject.model.Organization;
 import com.restinginbed.teamproject.repository.ClientRepository;
 import com.restinginbed.teamproject.repository.ItemRepository;
 import com.restinginbed.teamproject.repository.OrganizationRepository;
+import com.restinginbed.teamproject.service.ClientService;
 import com.restinginbed.teamproject.service.GooglePlacesService;
-import com.restinginbed.teamproject.controller.RouteController;
-import com.restinginbed.teamproject.dto.OrganizationDistanceDataTransferObject;
-import com.restinginbed.teamproject.model.Organization;
-
-import java.util.Collections;
+import com.restinginbed.teamproject.service.OrganizationService;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,8 +33,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import com.restinginbed.teamproject.service.ClientService;
-import com.restinginbed.teamproject.service.OrganizationService;
 
 
 /**
@@ -82,22 +80,23 @@ public class RouteControllerTest {
   }
 
 
-   @Test
+  @Test
   public void testRankNearestOrganizations_WithClientOrigin() {
     Integer clientId = defaultClient.getId();
 
-    when(mockClientRepository.findById(clientId))
-      .thenReturn(Optional.of(defaultClient));
+    when(mockClientRepository.findById(clientId)).thenReturn(Optional.of(defaultClient));
 
     List<Organization> organizations = Arrays.asList(defaultOrganization);
     when(mockOrganizationRepository.findAll()).thenReturn(organizations);
-    when(mockGooglePlacesService.getDistanceBetweenLocations(anyDouble(), anyDouble(), anyDouble(), anyDouble()))
-      .thenReturn(10.0);  // Assuming distance is 10.0 km
+    when(mockGooglePlacesService.getDistanceBetweenLocations(anyDouble(),
+            anyDouble(), anyDouble(), anyDouble()))
+            .thenReturn(10.0);  // Assuming distance is 10.0 km
 
     ResponseEntity<?> response = mockRouteController.rankNearestOrganizations(clientId, "client");
 
     assertEquals(HttpStatus.OK, response.getStatusCode());
-    List<OrganizationDistanceDataTransferObject> rankedDistances = (List<OrganizationDistanceDataTransferObject>) response.getBody();
+    List<OrganizationDistanceDataTransferObject> rankedDistances = (List<
+            OrganizationDistanceDataTransferObject>) response.getBody();
     assertNotNull(rankedDistances);
     assertEquals(1, rankedDistances.size());
     assertEquals(10.0, rankedDistances.get(0).getDistance());
@@ -108,16 +107,19 @@ public class RouteControllerTest {
     Integer orgId = defaultOrganization.getOrganizationId();
 
     when(mockOrganizationRepository.findById(orgId))
-      .thenReturn(Optional.of(defaultOrganization));
+            .thenReturn(Optional.of(defaultOrganization));
     List<Organization> organizations = Arrays.asList(defaultOrganization);
     when(mockOrganizationRepository.findAll()).thenReturn(organizations);
-    when(mockGooglePlacesService.getDistanceBetweenLocations(anyDouble(), anyDouble(), anyDouble(), anyDouble()))
-      .thenReturn(5.0);  // Assuming distance is 5.0 km
+    when(mockGooglePlacesService.getDistanceBetweenLocations(anyDouble(),
+            anyDouble(), anyDouble(), anyDouble()))
+            .thenReturn(5.0);  // Assuming distance is 5.0 km
 
-    ResponseEntity<?> response = mockRouteController.rankNearestOrganizations(orgId, "organization");
+    ResponseEntity<?> response = mockRouteController.rankNearestOrganizations(
+            orgId, "organization");
 
     assertEquals(HttpStatus.OK, response.getStatusCode());
-    List<OrganizationDistanceDataTransferObject> rankedDistances = (List<OrganizationDistanceDataTransferObject>) response.getBody();
+    List<OrganizationDistanceDataTransferObject> rankedDistances = (List<
+            OrganizationDistanceDataTransferObject>) response.getBody();
     assertNotNull(rankedDistances);
     assertEquals(1, rankedDistances.size());
     assertEquals(5.0, rankedDistances.get(0).getDistance());
@@ -127,7 +129,8 @@ public class RouteControllerTest {
   public void testRankNearestOrganizations_InvalidOriginType() {
     Integer originId = defaultClient.getId();
 
-    ResponseEntity<?> response = mockRouteController.rankNearestOrganizations(originId, "invalidType");
+    ResponseEntity<?> response = mockRouteController.rankNearestOrganizations(originId,
+            "invalidType");
 
     assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     assertEquals("Invalid origin type", response.getBody());
@@ -139,7 +142,8 @@ public class RouteControllerTest {
 
     when(mockClientRepository.findById(clientId)).thenReturn(Optional.empty());
 
-    ResponseEntity<?> response = mockRouteController.rankNearestOrganizations(clientId, "client");
+    ResponseEntity<?> response = mockRouteController.rankNearestOrganizations(clientId,
+            "client");
 
     assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     assertEquals("Origin client not found", response.getBody());
@@ -151,7 +155,8 @@ public class RouteControllerTest {
 
     when(mockOrganizationRepository.findById(orgId)).thenReturn(Optional.empty());
 
-    ResponseEntity<?> response = mockRouteController.rankNearestOrganizations(orgId, "organization");
+    ResponseEntity<?> response = mockRouteController.rankNearestOrganizations(orgId,
+            "organization");
 
     assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     assertEquals("Origin organization not found", response.getBody());
@@ -162,7 +167,7 @@ public class RouteControllerTest {
     Integer clientId = defaultClient.getId();
 
     when(mockClientRepository.findById(clientId))
-      .thenReturn(Optional.of(defaultClient));
+            .thenReturn(Optional.of(defaultClient));
     Organization invalidOrg = new Organization("Invalid Organization", "No location");
     invalidOrg.setOrganizationId(3);
     List<Organization> organizations = Arrays.asList(invalidOrg);
@@ -171,7 +176,8 @@ public class RouteControllerTest {
     ResponseEntity<?> response = mockRouteController.rankNearestOrganizations(clientId, "client");
 
     assertEquals(HttpStatus.OK, response.getStatusCode());
-    List<OrganizationDistanceDataTransferObject> rankedDistances = (List<OrganizationDistanceDataTransferObject>) response.getBody();
+    List<OrganizationDistanceDataTransferObject> rankedDistances = (List<
+            OrganizationDistanceDataTransferObject>) response.getBody();
   }
 
   @Test
@@ -209,7 +215,8 @@ public class RouteControllerTest {
   @Test
   public void testUpdateItem_Success() {
     Integer itemId = defaultItem.getId();
-    Item updatedItem = new Item(defaultItem.getId(), "Updated Client", "test", 10,
+    Item updatedItem = new Item(defaultItem.getId(), "Updated Client",
+            "test", 10,
             defaultItem.getOrganizationId());
 
     when(mockItemRepository.existsById(itemId)).thenReturn(true);
@@ -226,7 +233,8 @@ public class RouteControllerTest {
   @Test
   public void testSearchItems_Success() {
     String searchTerm = "Test";
-    List<Item> itemList = List.of(new Item(0, "Test Item", "test", 10, 0));
+    List<Item> itemList = List.of(new Item(0, "Test Item", "test",
+            10, 0));
 
     when(mockItemRepository.findByNameContaining(searchTerm)).thenReturn(itemList);
 
@@ -239,7 +247,7 @@ public class RouteControllerTest {
   @Test
   public void testSearchItems_ItemNotFound() {
     String searchTerm = "Test";
-    
+
     when(mockItemRepository.findByNameContaining(searchTerm)).thenReturn(Collections.emptyList());
 
     ResponseEntity<?> response = mockRouteController.searchItems(searchTerm);
@@ -349,7 +357,8 @@ public class RouteControllerTest {
   @Test
   public void testUpdateItemDoesntExist() {
     Integer itemId = 1;
-    Item updatedItem = new Item(defaultItem.getId(), "Updated Client", "test", 10,
+    Item updatedItem = new Item(defaultItem.getId(), "Updated Client",
+            "test", 10,
             defaultItem.getOrganizationId());
 
     when(mockItemRepository.existsById(itemId)).thenReturn(false);
@@ -389,7 +398,8 @@ public class RouteControllerTest {
 
   @Test
   public void testResolveDistance_InvalidOriginType() {
-    ResponseEntity<?> response = mockRouteController.resolveDistance(1, "invalidType", 2, "client");
+    ResponseEntity<?> response = mockRouteController.resolveDistance(1,
+            "invalidType", 2, "client");
 
     assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     assertEquals("Invalid origin type", response.getBody());
@@ -399,7 +409,8 @@ public class RouteControllerTest {
   public void testResolveDistance_OriginNotFound() {
     when(mockClientRepository.findById(1)).thenReturn(Optional.empty());
 
-    ResponseEntity<?> response = mockRouteController.resolveDistance(1, "client", 2, "client");
+    ResponseEntity<?> response = mockRouteController.resolveDistance(1,
+            "client", 2, "client");
 
     assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     assertEquals("Origin client not found", response.getBody());
@@ -410,7 +421,8 @@ public class RouteControllerTest {
     when(mockClientRepository.findById(1)).thenReturn(Optional.of(defaultClient));
     when(mockOrganizationRepository.findById(2)).thenReturn(Optional.empty());
 
-    ResponseEntity<?> response = mockRouteController.resolveDistance(1, "client", 2, "organization");
+    ResponseEntity<?> response = mockRouteController.resolveDistance(1,
+            "client", 2, "organization");
 
     assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     assertEquals("Destination organization not found", response.getBody());
@@ -418,18 +430,19 @@ public class RouteControllerTest {
 
   @Test
   public void testResolveDistance_InvalidCoordinates() {
-    ResponseEntity<?> response = mockRouteController.resolveDistance(1, "client", 2, "organization");
-    
+    ResponseEntity<?> response = mockRouteController.resolveDistance(1,
+            "client", 2, "organization");
+
     assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     assertEquals("Origin client not found", response.getBody());
   }
 
   @Test
   public void testResolveDistance_OrganizationToOrganization_Success() {
-    Integer originId = 1;
-    Integer destId = 2;
-    String originType = "organization";
-    String destType = "organization";
+    final Integer originId = 1;
+    final Integer destId = 2;
+    final String originType = "organization";
+    final String destType = "organization";
 
     Organization originOrganization = new Organization();
     originOrganization.setLatitude(40.748817);  // Empire State Building latitude
@@ -442,10 +455,12 @@ public class RouteControllerTest {
     when(mockOrganizationRepository.findById(originId)).thenReturn(Optional.of(originOrganization));
     when(mockOrganizationRepository.findById(destId)).thenReturn(Optional.of(destOrganization));
 
-    when(mockGooglePlacesService.getDistanceBetweenLocations(anyDouble(), anyDouble(), anyDouble(), anyDouble()))
-      .thenReturn(500.0); // Example distance in meters
+    when(mockGooglePlacesService.getDistanceBetweenLocations(anyDouble(), anyDouble(),
+            anyDouble(), anyDouble()))
+            .thenReturn(500.0); // Example distance in meters
 
-    ResponseEntity<?> response = mockRouteController.resolveDistance(originId, originType, destId, destType);
+    ResponseEntity<?> response = mockRouteController.resolveDistance(originId, originType,
+            destId, destType);
 
     assertEquals(HttpStatus.OK, response.getStatusCode());
     assertEquals(500.0, response.getBody());
@@ -453,23 +468,24 @@ public class RouteControllerTest {
 
   @Test
   public void testResolveDistance_InvalidOriginCoordinates() {
-    Integer originId = 1;
-    Integer destId = 2;
-    String originType = "client";
-    String destType = "organization";
+    final Integer originId = 1;
+    final Integer destId = 2;
+    final String originType = "client";
+    final String destType = "organization";
 
     Client originClient = new Client();
     originClient.setLatitude(-91.0);  // Invalid latitude
     originClient.setLongitude(-181.0); // Invalid longitude
 
     Organization destOrganization = new Organization();
-    destOrganization.setLatitude(37.774929); 
-    destOrganization.setLongitude(-122.419418); 
+    destOrganization.setLatitude(37.774929);
+    destOrganization.setLongitude(-122.419418);
 
     when(mockClientRepository.findById(originId)).thenReturn(Optional.of(originClient));
     when(mockOrganizationRepository.findById(destId)).thenReturn(Optional.of(destOrganization));
 
-    ResponseEntity<?> response = mockRouteController.resolveDistance(originId, originType, destId, destType);
+    ResponseEntity<?> response = mockRouteController.resolveDistance(originId, originType,
+            destId, destType);
 
     assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     assertEquals("Invalid location format", response.getBody());
@@ -477,34 +493,35 @@ public class RouteControllerTest {
 
   @Test
   public void testResolveDistance_InvalidDestinationType() {
-    Integer originId = 1;
-    Integer destId = 2;
-    String originType = "client";
-    String destType = "FAKE"; //Invalid destType
+    final Integer originId = 1;
+    final Integer destId = 2;
+    final String originType = "client";
+    final String destType = "FAKE"; //Invalid destType
 
     Client originClient = new Client();
     originClient.setLatitude(0.0);
-    originClient.setLongitude(0.0); 
+    originClient.setLongitude(0.0);
 
     Organization destOrganization = new Organization();
-    destOrganization.setLatitude(37.774929); 
-    destOrganization.setLongitude(-122.419418); 
+    destOrganization.setLatitude(37.774929);
+    destOrganization.setLongitude(-122.419418);
 
     when(mockClientRepository.findById(originId)).thenReturn(Optional.of(originClient));
     when(mockOrganizationRepository.findById(destId)).thenReturn(Optional.of(destOrganization));
 
-    ResponseEntity<?> response = mockRouteController.resolveDistance(originId, originType, destId, destType);
+    ResponseEntity<?> response = mockRouteController.resolveDistance(originId, originType,
+            destId, destType);
 
     assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     assertEquals("Invalid destination type", response.getBody());
   }
 
   @Test
-public void testResolveDistance_ClientToClient_Success() {
-    Integer originId = 1;
-    Integer destId = 2;
-    String originType = "client";
-    String destType = "client";
+  public void testResolveDistance_ClientToClient_Success() {
+    final Integer originId = 1;
+    final Integer destId = 2;
+    final String originType = "client";
+    final String destType = "client";
 
     Client originClient = new Client();
     originClient.setLatitude(40.748817);  // Empire State Building latitude
@@ -516,20 +533,23 @@ public void testResolveDistance_ClientToClient_Success() {
 
     when(mockClientRepository.findById(originId)).thenReturn(Optional.of(originClient));
     when(mockClientRepository.findById(destId)).thenReturn(Optional.of(destClient));
-    when(mockGooglePlacesService.getDistanceBetweenLocations(anyDouble(), anyDouble(), anyDouble(), anyDouble()))
-      .thenReturn(500.0); // Example distance in meters
+    when(mockGooglePlacesService.getDistanceBetweenLocations(anyDouble(), anyDouble(),
+            anyDouble(), anyDouble()))
+            .thenReturn(500.0); // Example distance in meters
 
-    ResponseEntity<?> response = mockRouteController.resolveDistance(originId, originType, destId, destType);
+    ResponseEntity<?> response = mockRouteController.resolveDistance(originId, originType,
+            destId, destType);
 
     assertEquals(HttpStatus.OK, response.getStatusCode());
     assertEquals(500.0, response.getBody());
-}
-  
+  }
+
   @Test
   public void testRetrieveOrganization_Success() {
     Integer organizationId = defaultOrganization.getOrganizationId();
 
-    when(mockOrganizationRepository.findById(organizationId)).thenReturn(Optional.of(defaultOrganization));
+    when(mockOrganizationRepository.findById(organizationId)).thenReturn(Optional
+            .of(defaultOrganization));
 
     ResponseEntity<?> response = mockRouteController.retrieveOrganization(organizationId);
 
@@ -543,7 +563,7 @@ public void testResolveDistance_ClientToClient_Success() {
     System.out.println("Latitude: " + retrievedOrganization.getLatitude());
     System.out.println("Longitude: " + retrievedOrganization.getLongitude());
   }
-  
+
   @Test
   public void testRetrieveClient_Success() {
     Integer clientId = defaultClient.getId();
@@ -612,7 +632,7 @@ public void testResolveDistance_ClientToClient_Success() {
   public void testUpdateClient_NullClient() {
     Integer clientId = defaultClient.getId();
     ResponseEntity<?> response = mockRouteController.updateClient(clientId, null);
-    
+
     assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     assertEquals("Client not found", response.getBody());
   }
@@ -621,7 +641,7 @@ public void testResolveDistance_ClientToClient_Success() {
   public void testUpdateItem_NullItem() {
     Integer itemId = defaultItem.getId();
     ResponseEntity<?> response = mockRouteController.updateItem(itemId, null);
-    
+
     assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     assertEquals("Item not found", response.getBody());
   }
@@ -630,7 +650,7 @@ public void testResolveDistance_ClientToClient_Success() {
   public void testDeleteClient_NegativeId() {
     int clientId = -1;
     ResponseEntity<?> response = mockRouteController.deleteClient(clientId);
-    
+
     assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     assertEquals("Client not found", response.getBody());
   }
@@ -639,7 +659,7 @@ public void testResolveDistance_ClientToClient_Success() {
   public void testDeleteItem_NegativeId() {
     int itemId = -1;
     ResponseEntity<?> response = mockRouteController.deleteItem(itemId);
-    
+
     assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     assertEquals("Item not found", response.getBody());
   }
@@ -648,7 +668,7 @@ public void testResolveDistance_ClientToClient_Success() {
   public void testRetrieveOrganization_NegativeId() {
     Integer orgId = -1;
     ResponseEntity<?> response = mockRouteController.retrieveOrganization(orgId);
-    
+
     assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     assertEquals("Organization not found", response.getBody());
   }

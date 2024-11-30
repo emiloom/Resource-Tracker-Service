@@ -18,7 +18,7 @@ import org.springframework.web.servlet.view.RedirectView;
 /**
  * Unit tests for OAuth2Controller.
  */
-public class OAuth2ControllerUnitTests {
+public class Oauth2ControllerUnitTests {
 
   @InjectMocks
   private OAuth2Controller oauth2Controller;
