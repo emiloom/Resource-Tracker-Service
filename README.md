@@ -175,7 +175,7 @@ as of the day of 10/18/2024 (These can be found in the reports folder):
 ## Branch Coverage Reporting
 We used JaCoCo to perform branch analysis in order to see the branch coverage of the relevant code within the code base. See below for screenshots demonstrating output.
 
-![Screenshot of a code coverage report from the plugin](TeamProject/jacoco-report-result.png)
+![Screenshot of a code coverage report from the plugin](TeamProject/I2-jacoco.png)
 
 ## PMD
 We added Maven PMD plugin to our pom.xml file and used our own ruleset. Note: our ruleset is just the default ruleset taken from https://maven.apache.org/plugins/maven-pmd-plugin/examples/usingRuleSets.html
