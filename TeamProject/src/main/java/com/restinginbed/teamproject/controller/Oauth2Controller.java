@@ -24,6 +24,7 @@ import org.springframework.web.servlet.view.RedirectView;
  * storing user details or generating a JWT token for the user.</p>
  */
 @RestController
+@SuppressWarnings("PMD.UnusedLocalVariable")
 public class Oauth2Controller {
   private final OAuth2AuthorizedClientService clientService;
 
