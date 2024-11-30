@@ -1,11 +1,10 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
 import {useCookies} from "react-cookie";
 
 const OAuthButton = () => {
     const navigate = useNavigate();
-    const [cookies, setCookies] = useCookies(['auth_token', 'exp_time']);
+    const [cookies, setCookies] = useCookies(['auth_token', 'exp_time', 'uid']);
 
     const handleOAuthSubmit = () => {
         const googleClientId = "667083991765-8egqcnldoa0m80c7kpm1q4korlbmvn91.apps.googleusercontent.com";
@@ -25,10 +24,43 @@ const OAuthButton = () => {
             }
 
             const data = event.data;
-            if (data) {
+            if (data.accessToken) {
                 setCookies('auth_token', data.accessToken);
                 setCookies('exp_time', data.expiresIn);
-                navigate("/dashboard");
+
+                // get uid with auth_token
+                fetch('http://localhost:8080/api/resource', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${data.accessToken}`,
+                    },
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        const userId = data['sub'];
+                        setCookies('uid', userId);
+
+                        const organizationId = Number(userId) % (2 ** 31);
+
+                        // check if uid is of an existing org
+                        return fetch(`http://localhost:8080/retrieveOrganization?organizationId=${organizationId}`, {
+                            method: 'GET',
+                        });
+                    })
+                    .then(response => {
+                        // user is a new org
+                        if (response.status === 404) {
+                            navigate('/setup');
+                        } else if (response.ok) {
+                            // org already exists
+                            navigate("/dashboard");
+                        } else {
+                            throw new Error('Error retrieving organization');
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+
+
             }
         };
 

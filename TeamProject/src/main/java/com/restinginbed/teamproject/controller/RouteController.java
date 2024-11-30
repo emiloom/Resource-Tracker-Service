@@ -578,8 +578,9 @@ public class RouteController {
           produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> getOrganizationItems(@PathVariable Integer organizationId) {
     try {
+      System.out.println(organizationId);
       List<Item> items = itemRepository.findByOrganizationId(organizationId);
-      if (!items.isEmpty()) {
+      if (items != null && !items.isEmpty()) {
         return new ResponseEntity<>(items, HttpStatus.OK);
       } else {
         return new ResponseEntity<>("No items found", HttpStatus.NOT_FOUND);
