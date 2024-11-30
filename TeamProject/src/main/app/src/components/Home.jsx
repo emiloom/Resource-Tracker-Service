@@ -1,121 +1,109 @@
-import {Button} from "@mui/material";
-import {useRef, useState} from "react";
+import { Button } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import {Link, useLocation} from "react-router-dom";
 import ReactLoading from 'react-loading';
-import {useCookies} from "react-cookie";
+import { useRef, useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useCookies } from 'react-cookie';
+import SearchResultsTable from './SearchResultsTable';
 
 export default function Home() {
-
-    const location = useLocation();
+    const navigate = useNavigate();
     const inputRef = useRef(null);
 
-    const [query, setQuery] = useState("");
+    const [query, setQuery] = useState('');
     const [loading, setLoading] = useState(false);
-    const [cookies, setCookies] = useCookies(['auth_token', 'exp_time']);
+    const [items, setItems] = useState([]);
+    const [organizations, setOrganizations] = useState({});
+    const [cookies] = useCookies(['auth_token']);
 
     const user = cookies.auth_token;
 
-    const handleSearchQuery = (e) => {
-        e.preventDefault();
-        setQuery(e.target.value);
-    }
-
-    const handleEnter = (e) => {
-        if (e.key === "Enter") {
-            handleSearch(e);
-            if (inputRef.current) {
-                inputRef.current.blur();
+    useEffect(() => {
+        const fetchOrganizations = async () => {
+            try {
+                const response = await fetch('http://localhost:8080/organizations');
+                if (!response.ok) throw new Error('Failed to fetch organizations');
+                const orgs = await response.json();
+                const orgMap = orgs.reduce((acc, org) => {
+                    acc[org.id] = { name: org.name, location: org.location }; // Store name and location
+                    return acc;
+                }, {});
+                setOrganizations(orgMap);
+            } catch (error) {
+                console.error('Error fetching organizations:', error);
             }
-        }
-    }
+        };
 
-    const handleSearch = (e) => {
+        fetchOrganizations();
+    }, []);
+
+    const handleSearchQuery = (e) => {
+        setQuery(e.target.value);
+    };
+
+    const handleSearch = async (e) => {
         e.preventDefault();
         setLoading(true);
-
-        setTimeout(() => {
+        try {
+            const response = await fetch(`http://localhost:8080/searchItems?searchTerm=${query}`);
+            if (!response.ok) throw new Error('Search failed');
+            const data = await response.json();
+            setItems(data);
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
             setLoading(false);
-        }, 1500)
-    }
+        }
+    };
+
+    const handleEnter = (e) => {
+        if (e.key === 'Enter') handleSearch(e);
+    };
 
     return (
-        <div
-            className="w-full h-full"
-        >
-            <header
-                className="border-b-2 border-b-black ~h-12 flex items-center justify-between"
-            >
-                <div
-                    className="flex gap-5 m-5"
-                >
-                    <Button>
-                        Search
-                    </Button>
-                    {
-                        user &&
+        <div className="w-full h-full">
+            <header className="border-b-2 border-b-black ~h-12 flex items-center justify-between">
+                <div className="flex gap-5 m-5">
+                    <Button>Search</Button>
+                    {user && (
                         <Link to="/dashboard">
-                            <Button>
-                                Dashboard
-                            </Button>
+                            <Button>Dashboard</Button>
                         </Link>
-                    }
+                    )}
                 </div>
 
-                <div
-                    className="w-1/2 flex gap-2 items-center "
-                >
+                <div className="w-1/2 flex gap-2 items-center">
                     <input
                         ref={inputRef}
                         className="w-11/12 p-2 border-2 border-black"
-                        onChange={(e) => handleSearchQuery(e)}
                         type="text"
+                        value={query}
+                        onChange={handleSearchQuery}
                         onKeyDown={handleEnter}
                     />
-                    <Button
-                        onClick={(e) => handleSearch(e)}
-                    >
-                        <SearchIcon
-                            className="w-10 h-10 text-black"
-                        />
+                    <Button onClick={handleSearch}>
+                        <SearchIcon className="w-10 h-10 text-black" />
                     </Button>
                 </div>
 
-                <div
-                    className="flex gap-5 m-5"
-                >
-                    {
-                        user ?
-                            <Button
-                                variant="contained"
-                            >
-                                Logout
-                            </Button> :
-                            <Button
-                                variant="contained"
-                            >
-                                <Link
-                                    to={'/login'}
-                                >
-                                    Login
-                                </Link>
-                            </Button>
-                    }
+                <div className="flex gap-5 m-5">
+                    {user ? (
+                        <Button variant="contained">Logout</Button>
+                    ) : (
+                        <Link to="/login">
+                            <Button variant="contained">Login</Button>
+                        </Link>
+                    )}
                 </div>
             </header>
 
-            {/*  Body  */}
-            <div
-                className="w-full h-full flex justify-center"
-            >
-                {
-                    loading ?
-                        <ReactLoading type="spinningBubbles" color="blue" /> :
-                        <div>
-
-                        </div>
-                }
-            </div>
+            <main className="w-full h-full flex justify-center p-4">
+                {loading ? (
+                    <ReactLoading type="spinningBubbles" color="blue" />
+                ) : (
+                    <SearchResultsTable items={items} organizations={organizations} />
+                )}
+            </main>
         </div>
-    )
+    );
 }
