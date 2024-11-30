@@ -86,22 +86,16 @@ public class RouteControllerTest {
   public void testRankNearestOrganizations_WithClientOrigin() {
     Integer clientId = defaultClient.getId();
 
-    // Mock Client location
     when(mockClientRepository.findById(clientId))
       .thenReturn(Optional.of(defaultClient));
 
-    // Mock organizations
     List<Organization> organizations = Arrays.asList(defaultOrganization);
     when(mockOrganizationRepository.findAll()).thenReturn(organizations);
-
-    // Mock distance calculation
     when(mockGooglePlacesService.getDistanceBetweenLocations(anyDouble(), anyDouble(), anyDouble(), anyDouble()))
       .thenReturn(10.0);  // Assuming distance is 10.0 km
 
-    // Act
     ResponseEntity<?> response = mockRouteController.rankNearestOrganizations(clientId, "client");
 
-    // Assert
     assertEquals(HttpStatus.OK, response.getStatusCode());
     List<OrganizationDistanceDataTransferObject> rankedDistances = (List<OrganizationDistanceDataTransferObject>) response.getBody();
     assertNotNull(rankedDistances);
