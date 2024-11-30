@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.restinginbed.teamproject.controller.OAuth2Controller;
+import com.restinginbed.teamproject.controller.Oauth2Controller;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -21,7 +21,7 @@ import org.springframework.web.servlet.view.RedirectView;
 public class Oauth2ControllerUnitTests {
 
   @InjectMocks
-  private OAuth2Controller oauth2Controller;
+  private Oauth2Controller oauth2Controller;
 
   @Mock
   private OAuth2AuthorizedClientService clientService;
