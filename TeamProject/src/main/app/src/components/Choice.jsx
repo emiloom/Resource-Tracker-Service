@@ -20,7 +20,7 @@ export default function Choice() {
                 className="w-1/5 flex flex-col items-center justify-center gap-5"
             >
                 <h1 className="mb-5 text-2xl">
-                    Register as a
+                    Register as
                 </h1>
                 <Button
                     variant="contained"
