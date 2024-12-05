@@ -14,71 +14,49 @@ export default function Home() {
     const [query, setQuery] = useState('');
     const [loading, setLoading] = useState(false);
     const [items, setItems] = useState([]);
-    const [organizations, setOrganizations] = useState({});
-    const [cookies, setCookies] = useCookies(['auth_token', 'exp_time', 'uid']);
-
-    const user = cookies.auth_token;
-
-    useEffect(() => {
-        const fetchOrganizations = async () => {
-            try {
-                const response = await fetch('https://restinginbed.ue.r.appspot.com/organizations');
-                if (!response.ok) throw new Error('Failed to fetch organizations');
-                const orgs = await response.json();
-                const orgMap = orgs.reduce((acc, org) => {
-                    acc[org.id] = { name: org.name, location: org.location }; // Store name and location
-                    return acc;
-                }, {});
-                setOrganizations(orgMap);
-            } catch (error) {
-                console.error('Error fetching organizations:', error);
-            }
-        };
-
-        fetchOrganizations();
-    }, []);
+    const [cookies] = useCookies(['auth_token', 'exp_time', 'uid']);
+    const user = cookies.uid;
 
     const handleSearchQuery = (e) => {
         setQuery(e.target.value);
     };
 
-    const handleSearch = async (e) => {
-        e.preventDefault();
-        setLoading(true);
+    const fetchDistance = async (originId, originType, destId, destType) => {
+        const response = await fetch(
+            `https://restinginbed.ue.r.appspot.com/resolveDistance?originId=${originId}&originType=${originType}&destId=${destId}&destType=${destType}`
+        );
+        if (!response.ok) throw new Error('Failed to fetch distance');
+        return await response.json();
+    };
 
+    const handleSearch = async () => {
         try {
-            // Fetch search results
-            const response = await fetch(`https://restinginbed.ue.r.appspot.com/searchItems?searchTerm=${query}`);
-            if (!response.ok) throw new Error('Search failed');
-            const data = await response.json();
-
-            // Fetch distances for ranking
-            const originId = Number(cookies.uid) % (2 ** 31);;
-            const originType = 'client';
-            const rankResponse = await fetch(
-                `https://restinginbed.ue.r.appspot.com/rankNearestOrganizations?originId=${originId}&originType=${originType}`
+            setLoading(true);
+            const itemResponse = await fetch(
+                `https://restinginbed.ue.r.appspot.com/searchItems?searchTerm=${query}`
             );
-            if (!rankResponse.ok) throw new Error('Failed to fetch ranked distances');
-            const rankedDistances = await rankResponse.json();
+            if (!itemResponse.ok) {
+                const errorBody = await itemResponse.text();
+                throw new Error(`Failed to fetch items: ${errorBody}`);
+            }
+            const items = await itemResponse.json();
 
-            // Create a map of organization ID to distance
-            const distanceMap = rankedDistances.reduce((acc, dto) => {
-                acc[dto.organization.id] = dto.distance;
-                return acc;
-            }, {});
+            const distances = await Promise.all(
+                items.map(async (item) => {
+                    const distance = await fetchDistance(
+                        '2106589184', // Assuming the user's ID is the origin
+                        'organization',   // Assuming user type is 'client'
+                        item.organizationId,
+                        'organization'
+                    );
+                    return { ...item, distance };
+                })
+            );
 
-            // Augment items with distances
-            const rankedItems = data.map(item => ({
-                ...item,
-                distance: distanceMap[item.organizationId] || Infinity, // Default to Infinity if no distance is found
-            }));
-
-            // Sort items by distance
-            rankedItems.sort((a, b) => a.distance - b.distance);
-
-            setItems(rankedItems);
+            const sortedItems = distances.sort((a, b) => a.distance - b.distance);
+            setItems(sortedItems);
         } catch (error) {
-            console.error('Error:', error);
+            console.error(error.message);
         } finally {
             setLoading(false);
         }
@@ -92,12 +70,7 @@ export default function Home() {
         <div className="w-full h-full">
             <header className="border-b-2 border-b-black ~h-12 flex items-center justify-between">
                 <div className="flex gap-5 m-5">
-                    <Button>Search</Button>
-                    {user && (
-                        <Link to="/dashboard">
-                            <Button>Dashboard</Button>
-                        </Link>
-                    )}
+                    <Button onClick={handleSearch}>Search</Button>
                 </div>
 
                 <div className="w-1/2 flex gap-2 items-center">
@@ -115,19 +88,13 @@ export default function Home() {
                 </div>
 
                 <div className="flex gap-5 m-5">
-                {
-                        user ?
-                            <Logout /> :
-                            <Button
-                                variant="contained"
-                            >
-                                <Link
-                                    to={'/login'}
-                                >
-                                    Login
-                                </Link>
-                            </Button>
-                    }
+                    {user ? (
+                        <Logout />
+                    ) : (
+                        <Button variant="contained">
+                            <Link to={'/login'}>Login</Link>
+                        </Button>
+                    )}
                 </div>
             </header>
 
@@ -135,7 +102,7 @@ export default function Home() {
                 {loading ? (
                     <ReactLoading type="spinningBubbles" color="blue" />
                 ) : (
-                    <SearchResultsTable items={items} organizations={organizations} />
+                    <SearchResultsTable items={items} />
                 )}
             </main>
         </div>

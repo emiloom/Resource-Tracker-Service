@@ -11,55 +11,30 @@ import {
     Button,
 } from '@mui/material';
 
-export default function SearchResultsTable({ items, organizations, onButtonClick }) {
+export default function SearchResultsTable({ items }) {
     return (
         <TableContainer component={Paper} sx={{ mt: 3, boxShadow: 3 }}>
             <Typography variant="h6" sx={{ p: 2, backgroundColor: '#1976d2', color: 'white', textAlign: 'center' }}>
                 Search Results
             </Typography>
             
-            <Button
-                variant="contained"
-                color="primary"
-                sx={{ p: 2, backgroundColor: '#1976d2', color: 'white',  marginTop: '10px', textAlign: 'center' }}
-                onClick={() => onButtonClick(item.id)}
-            >
-               Sort by Recommended
-            </Button>
             <Table>
                 <TableHead>
                     <TableRow>
                         <TableCell align="center" sx={{ fontWeight: 'bold' }}>Name</TableCell>
                         <TableCell align="center" sx={{ fontWeight: 'bold' }}>Description</TableCell>
                         <TableCell align="center" sx={{ fontWeight: 'bold' }}>Count</TableCell>
-                        <TableCell align="center" sx={{ fontWeight: 'bold' }}>Organization</TableCell>
-                        <TableCell align="center" sx={{ fontWeight: 'bold' }}>Location</TableCell>
-                        <TableCell align="center" sx={{ fontWeight: 'bold' }}>Open in GMaps</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
                     {items.length > 0 ? (
-                        items.map((item) => {
-                            const organization = organizations[item.organizationId] || {};
-                            return (
-                                <TableRow key={item.id}>
-                                    <TableCell align="center">{item.name}</TableCell>
-                                    <TableCell align="center">{item.description}</TableCell>
-                                    <TableCell align="center">{item.count}</TableCell>
-                                    <TableCell align="center">{organization.name || 'Unknown Organization'}</TableCell>
-                                    <TableCell align="center">{organization.location || 'Unknown Location'}</TableCell>
-                                    <TableCell align="center">
-                                        <Button
-                                            variant="contained"
-                                            color="primary"
-                                            onClick={() => onButtonClick(item.id)}
-                                        >
-                                            Open
-                                        </Button>
-                                    </TableCell>
-                                </TableRow>
-                            );
-                        })
+                        items.map((item) => (
+                            <TableRow key={item.id}>
+                                <TableCell align="center">{item.name}</TableCell>
+                                <TableCell align="center">{item.description}</TableCell>
+                                <TableCell align="center">{item.count || 'N/A'}</TableCell>
+                            </TableRow>
+                        ))
                     ) : (
                         <TableRow>
                             <TableCell colSpan={5} align="center">
