@@ -23,15 +23,7 @@ export default function SearchResultsTable({ items, organizations }) {
             <Typography variant="h6" sx={{ p: 2, backgroundColor: '#1976d2', color: 'white', textAlign: 'center' }}>
                 Search Results
             </Typography>
-            
-            <Button
-                variant="contained"
-                color="primary"
-                sx={{ p: 2, backgroundColor: '#1976d2', color: 'white',  marginTop: '10px', textAlign: 'center' }}
-                onClick={() => onButtonClick(item.id)}
-            >
-               Sort by Recommended
-            </Button>
+
             <Table>
                 <TableHead>
                     <TableRow>
