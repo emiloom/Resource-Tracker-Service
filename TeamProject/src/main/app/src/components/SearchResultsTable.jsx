@@ -8,14 +8,24 @@ import {
     TableRow,
     Paper,
     Typography,
+    Button,
 } from '@mui/material';
 
-export default function SearchResultsTable({ items, organizations }) {
+export default function SearchResultsTable({ items, organizations, onButtonClick }) {
     return (
         <TableContainer component={Paper} sx={{ mt: 3, boxShadow: 3 }}>
             <Typography variant="h6" sx={{ p: 2, backgroundColor: '#1976d2', color: 'white', textAlign: 'center' }}>
                 Search Results
             </Typography>
+            
+            <Button
+                variant="contained"
+                color="primary"
+                sx={{ p: 2, backgroundColor: '#1976d2', color: 'white',  marginTop: '10px', textAlign: 'center' }}
+                onClick={() => onButtonClick(item.id)}
+            >
+               Sort by Recommended
+            </Button>
             <Table>
                 <TableHead>
                     <TableRow>
@@ -24,6 +34,7 @@ export default function SearchResultsTable({ items, organizations }) {
                         <TableCell align="center" sx={{ fontWeight: 'bold' }}>Count</TableCell>
                         <TableCell align="center" sx={{ fontWeight: 'bold' }}>Organization</TableCell>
                         <TableCell align="center" sx={{ fontWeight: 'bold' }}>Location</TableCell>
+                        <TableCell align="center" sx={{ fontWeight: 'bold' }}>Open in GMaps</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -37,6 +48,15 @@ export default function SearchResultsTable({ items, organizations }) {
                                     <TableCell align="center">{item.count}</TableCell>
                                     <TableCell align="center">{organization.name || 'Unknown Organization'}</TableCell>
                                     <TableCell align="center">{organization.location || 'Unknown Location'}</TableCell>
+                                    <TableCell align="center">
+                                        <Button
+                                            variant="contained"
+                                            color="primary"
+                                            onClick={() => onButtonClick(item.id)}
+                                        >
+                                            Open
+                                        </Button>
+                                    </TableCell>
                                 </TableRow>
                             );
                         })
