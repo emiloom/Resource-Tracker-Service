@@ -5,9 +5,9 @@ import {useCookies} from "react-cookie";
 import {useNavigate} from "react-router-dom";
 
 export default function Setup() {
-    const [clientName, setClientName] = useState("");
+    const [orgName, setOrgName] = useState("");
     const [location, setLocation] = useState("");
-    const [error, setError] = useState({ clientName: false, location: false });
+    const [error, setError] = useState({ orgName: false, location: false });
 
     const [cookies, setCookies] = useCookies(['auth_token', 'exp_time', 'uid']);
 
@@ -17,11 +17,11 @@ export default function Setup() {
     const handleSubmit = () => {
         let hasError = false;
 
-        if (!clientName) {
-            setError((prev) => ({ ...prev, clientName: true }));
+        if (!orgName) {
+            setError((prev) => ({ ...prev, orgName: true }));
             hasError = true;
         } else {
-            setError((prev) => ({ ...prev, clientName: false }));
+            setError((prev) => ({ ...prev, orgName: false }));
         }
 
         if (!location) {
@@ -33,32 +33,32 @@ export default function Setup() {
 
         if (hasError) return;
 
-        const clientId = Number(cookies.uid) % (2 ** 31);
-        console.log('new client id', clientId);
-        const newClient = {
-            id: clientId,
-            name: `${clientName}`,
+        const organizationId = Number(cookies.uid) % (2 ** 31);
+        console.log('new org id', organizationId);
+        const newOrganization = {
+            id: organizationId,
+            name: `${orgName}`,
             location: `${location}`
         };
 
-        return fetch('https://restinginbed.ue.r.appspot.com/createClient', {
+        return fetch('https://restinginbed.ue.r.appspot.com/createOrganization', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(newClient),
+            body: JSON.stringify(newOrganization),
         }).then(response => {
             if (response.ok) {
-                navigate('/')
+                navigate('/dashboard')
             } else {
                 navigate('/logout')
             }
         })
     };
 
-    const handleClientName = (e) => {
+    const handleOrgName = (e) => {
         e.preventDefault();
-        setClientName(e.target.value);
+        setOrgName(e.target.value);
     };
 
     const handleLocation = (e) => {
@@ -69,16 +69,16 @@ export default function Setup() {
     return (
         <div className="w-screen h-screen flex items-center justify-center">
             <form action="" className="flex flex-col gap-4 w-1/5">
-                <h1 className="text-2xl">Register</h1>
+                <h1 className="text-2xl">Register Organization</h1>
                 <FormControl className="flex flex-col gap-4">
                     <TextField
                         required
                         fullWidth
-                        label="Name"
-                        onChange={(e) => handleClientName(e)}
-                        value={clientName}
-                        error={error.clientName}
-                        helperText={error.clientName ? "Name is required" : ""}
+                        label="Organization Name"
+                        onChange={(e) => handleOrgName(e)}
+                        value={orgName}
+                        error={error.orgName}
+                        helperText={error.orgName ? "Organization Name is required" : ""}
                     />
                     <TextField
                         required

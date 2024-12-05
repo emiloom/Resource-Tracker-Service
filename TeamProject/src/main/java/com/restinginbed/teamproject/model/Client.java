@@ -1,9 +1,8 @@
 package com.restinginbed.teamproject.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.io.Serial;
@@ -21,7 +20,7 @@ public class Client implements Serializable {
   private static final long serialVersionUID = 123456L;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @JsonProperty("id")
   @Column(name = "client_id", nullable = false)
   private int clientId;
 
@@ -45,6 +44,19 @@ public class Client implements Serializable {
   public Client(String name, String location) {
     this.clientName = name;
     this.clientLocation = location;
+  }
+
+  /**
+   * Constructs a Client using the parameters.
+   *
+   * @param name          name associated with Client
+   * @param location      location associated with Client
+   * @param id            the id of the Client
+   */
+  public Client(String name, String location, int id) {
+    this.clientName = name;
+    this.clientLocation = location;
+    this.clientId = id;
   }
 
   // no-argument constructor for JPA

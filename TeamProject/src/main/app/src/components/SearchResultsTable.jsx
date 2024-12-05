@@ -11,7 +11,13 @@ import {
     Button,
 } from '@mui/material';
 
-export default function SearchResultsTable({ items, organizations, onButtonClick }) {
+export default function SearchResultsTable({ items, organizations }) {
+
+    const handleOpenMaps = (item) => {
+        window.open(`http://maps.google.com/?q=${item.location}`, "_blank")
+    }
+
+
     return (
         <TableContainer component={Paper} sx={{ mt: 3, boxShadow: 3 }}>
             <Typography variant="h6" sx={{ p: 2, backgroundColor: '#1976d2', color: 'white', textAlign: 'center' }}>
@@ -52,7 +58,7 @@ export default function SearchResultsTable({ items, organizations, onButtonClick
                                         <Button
                                             variant="contained"
                                             color="primary"
-                                            onClick={() => onButtonClick(item.id)}
+                                            onClick={() => handleOpenMaps(item)}
                                         >
                                             Open
                                         </Button>
