@@ -5,6 +5,7 @@ import { useRef, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import SearchResultsTable from './SearchResultsTable';
+import Logout from './Logout';
 
 export default function Home() {
     const navigate = useNavigate();
@@ -14,7 +15,7 @@ export default function Home() {
     const [loading, setLoading] = useState(false);
     const [items, setItems] = useState([]);
     const [organizations, setOrganizations] = useState({});
-    const [cookies] = useCookies(['auth_token']);
+    const [cookies, setCookies] = useCookies(['auth_token', 'exp_time', 'uid']);
 
     const user = cookies.auth_token;
 
@@ -44,11 +45,38 @@ export default function Home() {
     const handleSearch = async (e) => {
         e.preventDefault();
         setLoading(true);
+
         try {
+            // Fetch search results
             const response = await fetch(`https://restinginbed.ue.r.appspot.com/searchItems?searchTerm=${query}`);
             if (!response.ok) throw new Error('Search failed');
             const data = await response.json();
-            setItems(data);
+
+            // Fetch distances for ranking
+            const originId = Number(cookies.uid) % (2 ** 31);;
+            const originType = 'client';
+            const rankResponse = await fetch(
+                `https://restinginbed.ue.r.appspot.com/rankNearestOrganizations?originId=${originId}&originType=${originType}`
+            );
+            if (!rankResponse.ok) throw new Error('Failed to fetch ranked distances');
+            const rankedDistances = await rankResponse.json();
+
+            // Create a map of organization ID to distance
+            const distanceMap = rankedDistances.reduce((acc, dto) => {
+                acc[dto.organization.id] = dto.distance;
+                return acc;
+            }, {});
+
+            // Augment items with distances
+            const rankedItems = data.map(item => ({
+                ...item,
+                distance: distanceMap[item.organizationId] || Infinity, // Default to Infinity if no distance is found
+            }));
+
+            // Sort items by distance
+            rankedItems.sort((a, b) => a.distance - b.distance);
+
+            setItems(rankedItems);
         } catch (error) {
             console.error('Error:', error);
         } finally {
@@ -87,13 +115,19 @@ export default function Home() {
                 </div>
 
                 <div className="flex gap-5 m-5">
-                    {user ? (
-                        <Button variant="contained">Logout</Button>
-                    ) : (
-                        <Link to="/login">
-                            <Button variant="contained">Login</Button>
-                        </Link>
-                    )}
+                {
+                        user ?
+                            <Logout /> :
+                            <Button
+                                variant="contained"
+                            >
+                                <Link
+                                    to={'/login'}
+                                >
+                                    Login
+                                </Link>
+                            </Button>
+                    }
                 </div>
             </header>
 
