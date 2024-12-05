@@ -43,24 +43,28 @@ const OAuthButton = () => {
                         const clientId = Number(userId) % (2 ** 31);
 
                         // check if uid is of an existing org
-                        return fetch(`https://restinginbed.ue.r.appspot.com/retrieveClient?clientId=${clientId}`, {
+                        fetch(`https://restinginbed.ue.r.appspot.com/retrieveClient?clientId=${clientId}`, {
                             method: 'GET',
-                        });
-                    })
-                    .then(response => {
-                        // user is a new client
-                        if (response.status === 404) {
-                            navigate('/setup');
-                        } else if (response.ok) {
-                            // client already exists
-                            navigate("/dashboard");
-                        } else {
-                            throw new Error('Error retrieving organization');
-                        }
+                        })
+                            .then(response => {
+                                if (response.status === 404) {
+                                    // try org
+                                    fetch(`https://restinginbed.ue.r.appspot.com/retrieveOrganization?organizationId=${clientId}`, {
+                                        method: 'GET',
+                                    })
+                                        .then(res => {
+                                            if (res.status === 404) {
+                                                navigate('/choice')
+                                            } else {
+                                                navigate('/dashboard')
+                                            }
+                                        })
+                                } else {
+                                    navigate('/')
+                                }
+                            })
                     })
                     .catch(error => console.error('Error:', error));
-
-
             }
         };
 

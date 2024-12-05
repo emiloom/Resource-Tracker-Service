@@ -6,6 +6,8 @@ import OAuthCallback from "./components/OAuthCallback.jsx";
 import {CookiesProvider} from "react-cookie";
 import {Logout} from "@mui/icons-material";
 import Setup from "./components/Setup.jsx";
+import Choice from "./components/Choice.jsx";
+import SetupOrg from "./components/SetupOrg.jsx";
 function App() {
 
     const router = createBrowserRouter(
@@ -17,6 +19,8 @@ function App() {
                 <Route path="dashboard" element={<Dashboard />} />
                 <Route path="logout" element={<Logout />} />
                 <Route path="setup" element={<Setup />} />
+                <Route path="choice" element={<Choice />} />
+                <Route path="setupOrg" element={<SetupOrg />} />
             </Route>
         )
     )
