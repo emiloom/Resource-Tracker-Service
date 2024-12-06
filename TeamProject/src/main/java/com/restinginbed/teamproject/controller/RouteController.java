@@ -176,6 +176,11 @@ public class RouteController {
       double destLat;
       double destLng;
 
+      System.out.println(originId);
+      System.out.println(originType);
+      System.out.println(destId);
+      System.out.println(destType);
+
       // get coordinates for origin
       if (originType.equalsIgnoreCase("client")) {
         Optional<Client> originClient = clientRepository.findById(originId);
@@ -578,8 +583,13 @@ public class RouteController {
           produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> getOrganizationItems(@PathVariable Integer organizationId) {
     try {
-      System.out.println(organizationId);
-      List<Item> items = itemRepository.findByOrganizationId(organizationId);
+      List<Item> items;
+      if (organizationId == null || organizationId == -1) {
+        items = itemRepository.findAll();
+      } else {
+        items = itemRepository.findByOrganizationId(organizationId);
+      }
+
       if (items != null && !items.isEmpty()) {
         return new ResponseEntity<>(items, HttpStatus.OK);
       } else {
@@ -600,7 +610,9 @@ public class RouteController {
   @GetMapping(value = "/searchItems", produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> searchItems(@RequestParam String searchTerm) {
     try {
-      Optional<List<Item>> items = Optional.of(itemRepository.findByNameContaining(searchTerm));
+//      Optional<List<Item>> items = Optional.of(itemRepository.findByNameContaining(searchTerm));
+      Optional<List<Item>> items = Optional.of(itemRepository.findByNameContainingIgnoreCase(
+              searchTerm));
 
       if (items.isPresent() && !items.get().isEmpty()) {
         return new ResponseEntity<>(items.get(), HttpStatus.OK);

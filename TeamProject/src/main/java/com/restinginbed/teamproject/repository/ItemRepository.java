@@ -12,5 +12,7 @@ import org.springframework.stereotype.Repository;
 public interface ItemRepository extends JpaRepository<Item, Integer> {
   List<Item> findByNameContaining(String name);
 
+  List<Item> findByNameContainingIgnoreCase(String searchTerm);
+
   List<Item> findByOrganizationId(Integer organizationId);
 }

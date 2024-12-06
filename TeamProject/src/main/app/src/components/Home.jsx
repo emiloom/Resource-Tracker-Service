@@ -5,18 +5,24 @@ import { useRef, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import SearchResultsTable from './SearchResultsTable';
+import Logout from './Logout';
 
 export default function Home() {
     const navigate = useNavigate();
     const inputRef = useRef(null);
-
+    const [organizations, setOrganizations] = useState({});
     const [query, setQuery] = useState('');
     const [loading, setLoading] = useState(false);
     const [items, setItems] = useState([]);
-    const [organizations, setOrganizations] = useState({});
-    const [cookies] = useCookies(['auth_token']);
+    const [cookies] = useCookies(['auth_token', 'exp_time', 'uid', 'type']);
+    const user = cookies.uid;
+    const type = cookies.type;
+    const [shownItems, setShownItems] = useState([])
 
-    const user = cookies.auth_token;
+    const handleSearchQuery = (e) => {
+        setQuery(e.target.value);
+    };
+
 
     useEffect(() => {
         const fetchOrganizations = async () => {
@@ -37,20 +43,66 @@ export default function Home() {
         fetchOrganizations();
     }, []);
 
-    const handleSearchQuery = (e) => {
-        setQuery(e.target.value);
+    const fetchDistance = async (originId, originType, destId, destType) => {
+        try {
+            console.log(typeof originId, typeof originType, typeof destId, typeof destType);
+
+            const response = await fetch(
+                `https://restinginbed.ue.r.appspot.com/resolveDistance?originId=${originId}&originType=${originType}&destId=${destId}&destType=${destType}`
+            );
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch distance');
+            }
+
+            const data = await response.json();
+            console.log(originId, destId, data);
+
+            return data; // Ensure you are returning the `distance` field here
+        } catch (error) {
+            console.error('Error fetching distance:', error);
+            return null; // Return null or a default value in case of an error
+        }
     };
 
-    const handleSearch = async (e) => {
-        e.preventDefault();
-        setLoading(true);
+
+    const handleSearch = async () => {
         try {
-            const response = await fetch(`https://restinginbed.ue.r.appspot.com/searchItems?searchTerm=${query}`);
-            if (!response.ok) throw new Error('Search failed');
-            const data = await response.json();
-            setItems(data);
+            setLoading(true);
+            const itemResponse = await fetch(
+                `https://restinginbed.ue.r.appspot.com/searchItems?searchTerm=${query}`
+            );
+            if (!itemResponse.ok) {
+                const errorBody = await itemResponse.text();
+                throw new Error(`Failed to fetch items: ${errorBody}`);
+            }
+            const items = await itemResponse.json();
+
+            console.log(items)
+
+            const clientId = Number(user) % (2 ** 31);
+
+            const itemsWithDistances = await Promise.all(
+                items.map(async (item) => {
+                    const distance = await fetchDistance(
+                        clientId,
+                        type,
+                        item.organizationId,
+                        'organization'
+                    );
+                    console.log('before distances', distance);
+                    return { ...item, distance };
+                })
+            );
+
+            // Sort the items by their 'distance' field
+            const sortedItems = itemsWithDistances.sort((a, b) => a.distance - b.distance);
+
+            // Set the sorted items to the state
+            setShownItems(sortedItems);
+            console.log(sortedItems, 'sorted');
         } catch (error) {
-            console.error('Error:', error);
+            console.error(error.message);
         } finally {
             setLoading(false);
         }
@@ -60,16 +112,62 @@ export default function Home() {
         if (e.key === 'Enter') handleSearch(e);
     };
 
+    useEffect(() => {
+        if (query !== "") return
+        fetch(`https://restinginbed.ue.r.appspot.com/organizations/-1/items`, {
+            method: 'GET'
+        }).then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+        })
+            .then(async data => {
+                console.log(data, 'unsorted');
+                const clientId = Number(user) % (2 ** 31);
+
+                // Map through the items and add a 'distance' field using fetchDistance
+                const itemsWithDistances = await Promise.all(
+                    data.map(async (item) => {
+                        const distance = await fetchDistance(
+                            clientId,
+                            type,
+                            item.organizationId,
+                            'organization'
+                        );
+                        console.log('before distances', distance);
+                        return { ...item, distance };
+                    })
+                );
+
+                // Sort the items by their 'distance' field
+                const sortedItems = itemsWithDistances.sort((a, b) => a.distance - b.distance);
+
+                // Set the sorted items to the state
+                setShownItems(sortedItems);
+                console.log(sortedItems, 'sorted');
+
+            })
+    }, [query]);
+
     return (
         <div className="w-full h-full">
             <header className="border-b-2 border-b-black ~h-12 flex items-center justify-between">
-                <div className="flex gap-5 m-5">
-                    <Button>Search</Button>
-                    {user && (
+                <div
+                    className="flex gap-5 m-5"
+                >
+                    <Link to="/">
+                        <Button>
+                            Search
+                        </Button>
+                    </Link>
+                    {
+                        type === 'organization' &&
                         <Link to="/dashboard">
-                            <Button>Dashboard</Button>
+                            <Button>
+                                Dashboard
+                            </Button>
                         </Link>
-                    )}
+                    }
                 </div>
 
                 <div className="w-1/2 flex gap-2 items-center">
@@ -88,11 +186,11 @@ export default function Home() {
 
                 <div className="flex gap-5 m-5">
                     {user ? (
-                        <Button variant="contained">Logout</Button>
+                        <Logout />
                     ) : (
-                        <Link to="/login">
-                            <Button variant="contained">Login</Button>
-                        </Link>
+                        <Button variant="contained">
+                            <Link to={'/login'}>Login</Link>
+                        </Button>
                     )}
                 </div>
             </header>
@@ -101,7 +199,7 @@ export default function Home() {
                 {loading ? (
                     <ReactLoading type="spinningBubbles" color="blue" />
                 ) : (
-                    <SearchResultsTable items={items} organizations={organizations} />
+                    <SearchResultsTable items={shownItems} organizations={organizations} />
                 )}
             </main>
         </div>

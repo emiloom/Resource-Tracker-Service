@@ -1,10 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
 import {useCookies} from "react-cookie";
+import {getType} from "./utils.js";
 
 const OAuthButton = () => {
     const navigate = useNavigate();
-    const [cookies, setCookies] = useCookies(['auth_token', 'exp_time', 'uid']);
+    const [cookies, setCookies] = useCookies(['auth_token', 'exp_time', 'uid', 'type']);
 
     const handleOAuthSubmit = () => {
         const googleClientId = "667083991765-8egqcnldoa0m80c7kpm1q4korlbmvn91.apps.googleusercontent.com";
@@ -17,7 +18,7 @@ const OAuthButton = () => {
             "popup=true,height=700,width=500"
         );
 
-        const handleMessage = (event) => {
+        const handleMessage = async (event) => {
             if (event.origin !== window.location.origin) {
                 console.error("Untrusted origin:", event.origin);
                 return;
@@ -36,33 +37,26 @@ const OAuthButton = () => {
                     },
                 })
                     .then(response => response.json())
-                    .then(data => {
+                    .then(data =>{
                         const userId = data['sub'];
                         setCookies('uid', userId);
 
                         const clientId = Number(userId) % (2 ** 31);
 
-                        // check if uid is of an existing org
-                        fetch(`https://restinginbed.ue.r.appspot.com/retrieveClient?clientId=${clientId}`, {
-                            method: 'GET',
-                        })
-                            .then(response => {
-                                if (response.status === 404) {
-                                    // try org
-                                    fetch(`https://restinginbed.ue.r.appspot.com/retrieveOrganization?organizationId=${clientId}`, {
-                                        method: 'GET',
-                                    })
-                                        .then(res => {
-                                            if (res.status === 404) {
-                                                navigate('/choice')
-                                            } else {
-                                                navigate('/dashboard')
-                                            }
-                                        })
-                                } else {
+                        getType(clientId)
+                            .then(type => {
+                                if (type === 'client') {
+                                    setCookies('type', 'client');
                                     navigate('/')
+                                } else if (type === 'organization') {
+                                    setCookies('type', 'organization');
+                                    navigate('/dashboard')
+                                } else {
+                                    navigate('/choice')
                                 }
                             })
+
+
                     })
                     .catch(error => console.error('Error:', error));
             }

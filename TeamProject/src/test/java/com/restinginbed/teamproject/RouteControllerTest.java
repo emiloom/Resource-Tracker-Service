@@ -236,7 +236,7 @@ public class RouteControllerTest {
     List<Item> itemList = List.of(new Item(0, "Test Item", "test",
             10, 0));
 
-    when(mockItemRepository.findByNameContaining(searchTerm)).thenReturn(itemList);
+    when(mockItemRepository.findByNameContainingIgnoreCase(searchTerm)).thenReturn(itemList);
 
     ResponseEntity<?> response = mockRouteController.searchItems(searchTerm);
 

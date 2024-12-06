@@ -52,7 +52,11 @@ export default function Header() {
                         <Button
                             variant="contained"
                         >
-                            Logout
+                            <Link
+                                to={'/login'}
+                            >
+                                Login
+                            </Link>
                         </Button> :
                         <Button
                             variant="contained"

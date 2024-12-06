@@ -15,6 +15,7 @@ export default function Logout() {
         removeCookie("auth_token");
         removeCookie("exp_time");
         removeCookie("uid");
+        removeCookie("type");
 
         if (cookies.auth_token) {
             fetch(`https://oauth2.googleapis.com/revoke?token=${cookies.auth_token}`, {
