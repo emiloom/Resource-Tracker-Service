@@ -9,7 +9,7 @@ export default function Setup() {
     const [location, setLocation] = useState("");
     const [error, setError] = useState({ orgName: false, location: false });
 
-    const [cookies, setCookies] = useCookies(['auth_token', 'exp_time', 'uid']);
+    const [cookies, setCookies] = useCookies(['auth_token', 'exp_time', 'uid', 'type']);
 
     const navigate = useNavigate();
 
@@ -49,6 +49,7 @@ export default function Setup() {
             body: JSON.stringify(newOrganization),
         }).then(response => {
             if (response.ok) {
+                setCookies('type', 'organization')
                 navigate('/dashboard')
             } else {
                 navigate('/logout')
